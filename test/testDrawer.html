@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <style>
+        body {
+            background: #e1e1e1;
+        }
+
+        .block {
+            background: #fff;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 10px;
+            padding-top: 40px;
+            position: relative;
+        }
+
+        .title {
+            position: absolute;
+            height: 40px;
+            line-height: 40px;
+            top: 0;
+            left: 5px;
+        }
+
+        button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            height: 30px;
+        }
+
+        .section {
+            background: #999;
+        }
+
+        .child-1 {
+            width: 100px;
+            height: 200px;
+            background: #00f;
+        }
+
+        .child-2 {
+            width: 100px;
+            height: 100px;
+            background: #ff0;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+    </head>
+    <body>
+        <div class="block block-1">
+            <span class="title">wrap-content bottom</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+        <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+        <script src="../drawer.js"></script>
+        <script src='./index.js'></script>
+    </body>
+</html>
