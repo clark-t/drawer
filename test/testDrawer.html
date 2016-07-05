@@ -52,11 +52,72 @@
         .hide {
             display: none;
         }
+
+        .block-2 .section {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .block-2 .target {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+        .block-4 .section {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .block-4 .target {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
     </style>
     </head>
     <body>
         <div class="block block-1">
-            <span class="title">wrap-content bottom</span>
+            <span class="title">in document flow bottom</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-2">
+            <span class="title">out of document flow bottom</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-3">
+            <span class="title">in document flow top</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-4">
+            <span class="title">out of document flow top</span>
             <button>toggle</button>
             <div class="section section-1">
                 <div class="target hide" style="background: #0f0">

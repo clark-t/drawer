@@ -8,7 +8,6 @@
      *
      * @param {Object} opts params
      * @param {$DOM} opts.$target $target
-     * @param {string} opts.mode 'match-parent' or 'wrap-content' default 'wrap-content'
      * @param {string} opts.direction 'top' or 'bottom' or 'left' or 'right'
      * @param {number} opts.duration duration
      * @param {Object} opts.showOption ways to show wrapper
@@ -27,7 +26,6 @@
 
     var OPTION_MAP = [
         '$target',
-        'mode',
         'direction',
         'duration',
         'showOption',
@@ -35,7 +33,6 @@
     ];
 
     var OPTION_DEFAULT = {
-        mode: 'wrap-content',
         direction: 'bottom',
         duration: 250
     };
@@ -79,8 +76,6 @@
             position: 'absolute'
         };
 
-        var mode = me.opts.mode;
-
         var targetPosition = $target.css('position');
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
@@ -90,9 +85,7 @@
             innerStyle.width = $parent.width() + 'px';
         }
 
-        if (mode === 'match-parent') {
-            innerStyle.height = $parent.outerHeight() + 'px';
-        }
+        innerStyle.height = $parent.outerHeight() + 'px';
 
         var $wrapper = getWrapper({
             wrapper: wrapperStyle,
@@ -146,14 +139,35 @@
 
         switch (direction) {
             case 'top':
-                wrapperStyle.width = $target.outerWidth() + 'px';
-                wrapperStyle.height = 0;
+                $.extend(wrapperStyle, {
+                    width: $target.outerWidth() + 'px',
+                    height: 0
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.top = 'auto';
+                }
+
+                $.extend(innerStyle, {
+                    'bottom': 0,
+                    'left': 0,
+                    '-webkit-transform': 'translateY(100%)',
+                    'transform': 'translateY(100%)'
+                });
                 break;
             case 'right':
                 break;
             case 'bottom':
-                wrapperStyle.width = $target.outerWidth() + 'px';
-                wrapperStyle.height = 0;
+                $.extend(wrapperStyle, {
+                    width: $target.outerWidth() + 'px',
+                    height: 0
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.bottom = 'auto';
+                }
 
                 $.extend(innerStyle, {
                     'top': 0,
@@ -184,14 +198,23 @@
             'transition': duration
         };
 
-        $wrapper.on('transitionend webkitTransitionEnd', function () {
+        me.endEvent($inner, me.opts.duration, function (e) {
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
             me.status = 'ready';
+            $wrapper = null;
+            $inner = null;
         });
 
         setTimeout(function () {
             switch (direction) {
+                case 'top':
+                    wrapperStyle.height = $target.outerHeight() + 'px';
+                    $.extend(innerStyle, {
+                        '-webkit-transform': 'translateY(0)',
+                        'transform': 'translateY(0)'
+                    });
+                    break;
                 case 'bottom':
                     wrapperStyle.height = $target.outerHeight() + 'px';
                     $.extend(innerStyle, {
@@ -205,7 +228,7 @@
 
             $wrapper.css(wrapperStyle);
             $inner.css(innerStyle);
-        });
+        }, 1);
     };
 
     Drawer.prototype.hide = function () {
@@ -219,6 +242,8 @@
         var $target = me.opts.$target;
 
         var originStyle = $target.attr('style');
+        // 动画效果
+        var duration = me.opts.duration / 1000 + 's';
 
         var wrapperStyle = {
             width: $target.outerWidth() + 'px',
@@ -234,7 +259,9 @@
         var innerStyle = {
             width: $target.outerWidth() + 'px',
             height: $target.outerHeight() + 'px',
-            position: 'absolute'
+            position: 'absolute',
+            '-webkit-transition': duration,
+            transition: duration
         };
 
         if ($target.css('position') !== 'static') {
@@ -248,8 +275,17 @@
 
         switch (direction) {
             case 'top':
-                wrapperStyle.width = $target.outerWidth() + 'px';
-                wrapperStyle.height = 0;
+                $.extend(innerStyle, {
+                    'bottom': 0,
+                    'left': 0,
+                    '-webkit-transform': 'translateY(0)',
+                    'transform': 'translateY(0)'
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.top = 'auto';
+                }
                 break;
             case 'right':
                 break;
@@ -260,6 +296,11 @@
                     '-webkit-transform': 'translateY(0)',
                     'transform': 'translateY(0)'
                 });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.bottom = 'auto';
+                }
                 break;
             case 'left':
                 break;
@@ -283,34 +324,44 @@
         $wrapper.insertAfter($target.css(targetStyle));
         $inner.append($target);
 
-        // 动画效果
-        var duration = me.opts.duration / 1000 + 's';
-
-        wrapperStyle = {
-            '-webkit-transition': duration,
-            'transition': duration
-        };
-
-        innerStyle = {
-            '-webkit-transition': duration,
-            'transition': duration
-        };
-
-        $wrapper.on('transitionend webkitTransitionEnd', function () {
+        me.endEvent($inner, me.opts.duration, function (e) {
             processStyle($target, me.opts.showOption, 'hide');
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
+            $wrapper = null;
+            $inner = null;
             me.status = 'ready';
         });
 
         setTimeout(function () {
             switch (direction) {
+                case 'top':
+                    wrapperStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        'height': 0
+                    };
+
+                    innerStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        '-webkit-transform': 'translateY(100%)',
+                        'transform': 'translateY(100%)'
+                    };
+                    break;
                 case 'bottom':
-                    wrapperStyle.height = 0;
-                    $.extend(innerStyle, {
+                    wrapperStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        'height': 0
+                    };
+
+                    innerStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
                         '-webkit-transform': 'translateY(-100%)',
                         'transform': 'translateY(-100%)'
-                    });
+                    };
                     break;
                 default:
                     break;
@@ -327,6 +378,32 @@
         }
         else {
             this.hide();
+        }
+    };
+
+    // 坑爹的transitionend不一定会触发 因此需要用个timer去做控制
+    // 参考自zepto anim方法
+    Drawer.prototype.endEvent = function ($dom, duration, callback) {
+        var fired = false;
+
+        if (duration > 0) {
+            $dom.on('webkitTransitionEnd transitionend', function (e) {
+                if (fired) {
+                    return;
+                }
+
+                fired = true;
+                callback && callback(e);
+            });
+
+            setTimeout(function (e) {
+                if (fired) {
+                    return;
+                }
+
+                fired = true;
+                callback && callback(e);
+            }, duration + 25);
         }
     };
 
@@ -384,7 +461,7 @@
            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
            .replace(/_/g, '-')
            .toLowerCase();
-      }
+    }
 
     function removeStyle($dom, excludeList) {
         if (typeof excludeList === 'string') {
