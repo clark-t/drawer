@@ -299,7 +299,9 @@
             right: $target.css('right'),
             bottom: $target.css('bottom'),
             left: $target.css('left'),
-            overflow: 'hidden'
+            overflow: 'hidden',
+            '-webkit-transition': duration,
+            'transition': duration
         };
 
         var innerStyle = {
@@ -405,56 +407,40 @@
             switch (direction) {
                 case 'top':
                     wrapperStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         'height': 0
                     };
 
                     innerStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         '-webkit-transform': 'translateY(100%)',
                         'transform': 'translateY(100%)'
                     };
                     break;
                 case 'bottom':
                     wrapperStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         'height': 0
                     };
 
                     innerStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         '-webkit-transform': 'translateY(-100%)',
                         'transform': 'translateY(-100%)'
                     };
                     break;
                 case 'left':
                     wrapperStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         'width': 0
                     };
 
                     innerStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         '-webkit-transform': 'translateX(100%)',
                         'transform': 'translateX(100%)'
                     };
                     break;
                 case 'right':
                     wrapperStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         'width': 0
                     };
 
                     innerStyle = {
-                        '-webkit-transition': duration,
-                        'transition': duration,
                         '-webkit-transform': 'translateX(-100%)',
                         'transform': 'translateX(-100%)'
                     };
