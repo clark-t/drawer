@@ -5,7 +5,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 2000,
+        duration: 1000,
         showOption: {
             remove: {
                 class: 'hide'
@@ -25,7 +25,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 2000,
+        duration: 1000,
         direction: 'bottom',
         showOption: {
             remove: {
@@ -46,7 +46,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 2000,
+        duration: 1000,
         direction: 'top',
         showOption: {
             remove: {
@@ -67,8 +67,92 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 2000,
+        duration: 1000,
         direction: 'top',
+        showOption: {
+            remove: {
+                class: 'hide'
+            }
+        }
+    });
+
+    $button.on('click', function () {
+        drawer.toggle();
+    });
+})();
+
+(function () {
+    var $block = $('.block-5');
+    var $button = $('button', $block);
+    var $target = $('.target', $block);
+
+    var drawer = new Drawer({
+        $target: $target,
+        duration: 1000,
+        direction: 'right',
+        showOption: {
+            remove: {
+                class: 'hide'
+            }
+        }
+    });
+
+    $button.on('click', function () {
+        drawer.toggle();
+    });
+})();
+
+(function () {
+    var $block = $('.block-6');
+    var $button = $('button', $block);
+    var $target = $('.target', $block);
+
+    var drawer = new Drawer({
+        $target: $target,
+        duration: 1000,
+        direction: 'right',
+        showOption: {
+            remove: {
+                class: 'hide'
+            }
+        }
+    });
+
+    $button.on('click', function () {
+        drawer.toggle();
+    });
+})();
+
+(function () {
+    var $block = $('.block-7');
+    var $button = $('button', $block);
+    var $target = $('.target', $block);
+
+    var drawer = new Drawer({
+        $target: $target,
+        duration: 1000,
+        direction: 'left',
+        showOption: {
+            remove: {
+                class: 'hide'
+            }
+        }
+    });
+
+    $button.on('click', function () {
+        drawer.toggle();
+    });
+})();
+
+(function () {
+    var $block = $('.block-8');
+    var $button = $('button', $block);
+    var $target = $('.target', $block);
+
+    var drawer = new Drawer({
+        $target: $target,
+        duration: 1000,
+        direction: 'left',
         showOption: {
             remove: {
                 class: 'hide'

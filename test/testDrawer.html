@@ -12,10 +12,12 @@
         .block {
             background: #fff;
             width: 300px;
-            height: 300px;
-            margin-bottom: 10px;
+            height: 320px;
+            margin: 0 10px 10px 10px;
             padding-top: 40px;
             position: relative;
+            overflow: hidden;
+            float: left;
         }
 
         .title {
@@ -35,6 +37,7 @@
 
         .section {
             background: #999;
+            padding-bottom: 20px;
         }
 
         .child-1 {
@@ -80,6 +83,42 @@
             left: 0;
             top: 0;
         }
+
+        .block-5 .section {
+            height: 300px;
+        }
+
+        .block-6 .section {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .block-6 .target {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+        .block-7 .section {
+            height: 300px;
+        }
+
+        .block-8 .section {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .block-8 .target {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            right: 0;
+            top: 0;
+        }
     </style>
     </head>
     <body>
@@ -118,6 +157,50 @@
 
         <div class="block block-4">
             <span class="title">out of document flow top</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-5">
+            <span class="title">in document flow right</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-6">
+            <span class="title">out of document flow right</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-7">
+            <span class="title">in document flow left</span>
+            <button>toggle</button>
+            <div class="section section-1">
+                <div class="target hide" style="background: #0f0">
+                    <div class="child-1"></div>
+                    <div class="child-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="block block-8">
+            <span class="title">out of document flow left</span>
             <button>toggle</button>
             <div class="section section-1">
                 <div class="target hide" style="background: #0f0">

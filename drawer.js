@@ -156,8 +156,6 @@
                     'transform': 'translateY(100%)'
                 });
                 break;
-            case 'right':
-                break;
             case 'bottom':
                 $.extend(wrapperStyle, {
                     width: $target.outerWidth() + 'px',
@@ -177,6 +175,40 @@
                 });
                 break;
             case 'left':
+                $.extend(wrapperStyle, {
+                    width: 0,
+                    height: $target.outerHeight() + 'px'
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.left = 'auto';
+                }
+
+                $.extend(innerStyle, {
+                    'top': 0,
+                    'right': 0,
+                    '-webkit-transform': 'translateX(100%)',
+                    'transform': 'translateX(100%)'
+                });
+                break;
+            case 'right':
+                $.extend(wrapperStyle, {
+                    width: 0,
+                    height: $target.outerHeight() + 'px'
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.right = 'auto';
+                }
+
+                $.extend(innerStyle, {
+                    'top': 0,
+                    'left': 0,
+                    '-webkit-transform': 'translateX(-100%)',
+                    'transform': 'translateX(-100%)'
+                });
                 break;
             default:
                 break;
@@ -220,6 +252,20 @@
                     $.extend(innerStyle, {
                         '-webkit-transform': 'translateY(0)',
                         'transform': 'translateY(0)'
+                    });
+                    break;
+                case 'left':
+                    wrapperStyle.width = $target.outerWidth() + 'px';
+                    $.extend(innerStyle, {
+                        '-webkit-transform': 'translateX(0)',
+                        'transform': 'translateX(0)'
+                    });
+                    break;
+                case 'right':
+                    wrapperStyle.width = $target.outerWidth() + 'px';
+                    $.extend(innerStyle, {
+                        '-webkit-transform': 'translateX(0)',
+                        'transform': 'translateX(0)'
                     });
                     break;
                 default:
@@ -287,8 +333,6 @@
                     wrapperStyle.top = 'auto';
                 }
                 break;
-            case 'right':
-                break;
             case 'bottom':
                 $.extend(innerStyle, {
                     'top': 0,
@@ -303,6 +347,30 @@
                 }
                 break;
             case 'left':
+                $.extend(innerStyle, {
+                    'top': 0,
+                    'right': 0,
+                    '-webkit-transform': 'translateX(0)',
+                    'transform': 'translateX(0)'
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.left = 'auto';
+                }
+                break;
+            case 'right':
+                $.extend(innerStyle, {
+                    'top': 0,
+                    'left': 0,
+                    '-webkit-transform': 'translateX(0)',
+                    'transform': 'translateX(0)'
+                });
+
+                if ($target.css('position') === 'absolute'
+                    || $target.css('position') === 'fixed') {
+                    wrapperStyle.right = 'auto';
+                }
                 break;
             default:
                 break;
@@ -361,6 +429,34 @@
                         'transition': duration,
                         '-webkit-transform': 'translateY(-100%)',
                         'transform': 'translateY(-100%)'
+                    };
+                    break;
+                case 'left':
+                    wrapperStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        'width': 0
+                    };
+
+                    innerStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        '-webkit-transform': 'translateX(100%)',
+                        'transform': 'translateX(100%)'
+                    };
+                    break;
+                case 'right':
+                    wrapperStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        'width': 0
+                    };
+
+                    innerStyle = {
+                        '-webkit-transition': duration,
+                        'transition': duration,
+                        '-webkit-transform': 'translateX(-100%)',
+                        'transform': 'translateX(-100%)'
                     };
                     break;
                 default:
