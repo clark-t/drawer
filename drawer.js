@@ -64,6 +64,8 @@
         var $target = me.opts.$target;
         var $parent = $target.parent();
 
+        var originStyle = $target.attr('style') || '';
+
         var wrapperStyle = {
             width: 0,
             height: 0,
@@ -101,7 +103,14 @@
         processStyle($target, me.opts.showOption, 'show');
         removeStyle($wrapper, 'display');
 
-        var originStyle = $target.attr('style');
+        var isFloat = false;
+
+        if ($target.width() === 0
+            && $target.css('display') === 'block'
+            && $target.css('float') === 'none') {
+            $target.css('float', 'left');
+            isFloat = true;
+        }
 
         if ($target.css('box-sizing') === 'border-box') {
             $target.css({
@@ -111,8 +120,8 @@
         }
         else {
             $target.css({
-                width: $target.outerWidth() + 'px',
-                height: $target.outerHeight() + 'px'
+                width: $target.width() + 'px',
+                height: $target.height() + 'px'
             });
         }
 
@@ -135,6 +144,10 @@
         else {
              wrapperStyle.position = 'relative';
             $target.css('position', 'static');
+        }
+
+        if (isFloat) {
+            removeStyle($target, 'float');
         }
 
         switch (direction) {
@@ -274,7 +287,7 @@
 
             $wrapper.css(wrapperStyle);
             $inner.css(innerStyle);
-        }, 1);
+        });
     };
 
     Drawer.prototype.hide = function () {
@@ -286,8 +299,7 @@
         var me = this;
         me.status = 'pending';
         var $target = me.opts.$target;
-
-        var originStyle = $target.attr('style');
+        var originStyle = $target.attr('style') || '';
         // 动画效果
         var duration = me.opts.duration / 1000 + 's';
 
@@ -494,6 +506,7 @@
             margin: 0,
             padding: 0,
             border: 'none',
+            overflow: 'hidden',
             background: 'transparent'
         };
 
@@ -550,7 +563,7 @@
             excludeList = [excludeList];
         }
 
-        var styleObj = parseStyleString($dom.attr('style'));
+        var styleObj = parseStyleString($dom.attr('style') || '');
         var styleStr = '';
 
         for (var key in styleObj) {

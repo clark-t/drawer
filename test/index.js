@@ -5,7 +5,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         showOption: {
             remove: {
                 class: 'hide'
@@ -25,7 +25,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'bottom',
         showOption: {
             remove: {
@@ -46,7 +46,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'top',
         showOption: {
             remove: {
@@ -67,7 +67,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'top',
         showOption: {
             remove: {
@@ -88,7 +88,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'right',
         showOption: {
             remove: {
@@ -109,7 +109,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'right',
         showOption: {
             remove: {
@@ -130,7 +130,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'left',
         showOption: {
             remove: {
@@ -151,7 +151,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 1000,
+        duration: 500,
         direction: 'left',
         showOption: {
             remove: {
