@@ -2,7 +2,9 @@
  * @file drawer.js 抽屉效果动画库
  * @author clarkt(clarktanglei@163.com)
  */
+
 (function () {
+
     /**
      * drawer constructor
      *
@@ -69,25 +71,36 @@
         var wrapperStyle = {
             width: 0,
             height: 0,
-            overflow: 'hidden',
-            position: 'relative',
             display: 'none'
         };
 
         var innerStyle = {
-            position: 'absolute'
+            padding: $parent.css('padding'),
+            border: $parent.css('border'),
+            width: $parent.css('width'),
+            height: $parent.css('height')
         };
+
+        innerStyle.margin = (' ' + innerStyle.padding)
+            .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
+                if (!$2 || $2 === '+') {
+                    $2 = '-';
+                }
+                else {
+                    $2 = '+';
+                }
+
+                return $1 + $2 + $3;
+            })
+            .replace(/^ /, '');
 
         var targetPosition = $target.css('position');
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
-            innerStyle.width = $parent.outerWidth() + 'px';
-        }
-        else {
-            innerStyle.width = $parent.width() + 'px';
+            wrapperStyle.position = targetPosition;
         }
 
-        innerStyle.height = $parent.outerHeight() + 'px';
+        // innerStyle.height = $parent.outerHeight() + 'px';
 
         var $wrapper = getWrapper({
             wrapper: wrapperStyle,
@@ -125,7 +138,7 @@
             });
         }
 
-        var wrapperStyle = {
+        wrapperStyle = {
             display: $target.css('display'),
             top: $target.css('top'),
             right: $target.css('right'),
@@ -133,18 +146,17 @@
             left: $target.css('left')
         };
 
-        var innerStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px'
-        };
+        if (targetPosition === 'absolute' || targetPosition === 'fixed') {
+            wrapperStyle[direction] = 'auto';
+        }
 
-        if (targetPosition !== 'static') {
-            wrapperStyle.position = $target.css('position');
-        }
-        else {
-             wrapperStyle.position = 'relative';
-            $target.css('position', 'static');
-        }
+        innerStyle = {
+            width: $target.outerWidth() + 'px',
+            height: $target.outerHeight() + 'px',
+            margin: 0,
+            padding: 0,
+            border: 'none'
+        };
 
         if (isFloat) {
             removeStyle($target, 'float');
@@ -157,17 +169,11 @@
                     height: 0
                 });
 
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.top = 'auto';
-                }
-
                 $.extend(innerStyle, {
-                    'bottom': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateY(100%)',
-                    'transform': 'translateY(100%)'
-                });
+                        bottom: 0,
+                        left: 0
+                    },
+                    getPrefix('transform', 'translateY(100%)'));
                 break;
             case 'bottom':
                 $.extend(wrapperStyle, {
@@ -175,17 +181,11 @@
                     height: 0
                 });
 
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.bottom = 'auto';
-                }
-
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateY(-100%)',
-                    'transform': 'translateY(-100%)'
-                });
+                        top: 0,
+                        left: 0
+                    },
+                    getPrefix('transform', 'translateY(-100%)'));
                 break;
             case 'left':
                 $.extend(wrapperStyle, {
@@ -193,17 +193,11 @@
                     height: $target.outerHeight() + 'px'
                 });
 
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.left = 'auto';
-                }
-
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'right': 0,
-                    '-webkit-transform': 'translateX(100%)',
-                    'transform': 'translateX(100%)'
-                });
+                        top: 0,
+                        right: 0
+                    },
+                    getPrefix('transform', 'translateX(100%)'));
                 break;
             case 'right':
                 $.extend(wrapperStyle, {
@@ -211,20 +205,18 @@
                     height: $target.outerHeight() + 'px'
                 });
 
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.right = 'auto';
-                }
-
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateX(-100%)',
-                    'transform': 'translateX(-100%)'
-                });
+                        top: 0,
+                        left: 0
+                    },
+                    getPrefix('transform', 'translateX(-100%)'));
                 break;
             default:
                 break;
+        }
+
+        if (targetPosition !== 'static') {
+            $target.css('position', 'static');
         }
 
         $wrapper.css(wrapperStyle);
@@ -233,15 +225,8 @@
         // 动画效果
         var duration = me.opts.duration / 1000 + 's';
 
-        wrapperStyle = {
-            '-webkit-transition': duration,
-            'transition': duration
-        };
-
-        innerStyle = {
-            '-webkit-transition': duration,
-            'transition': duration
-        };
+        wrapperStyle = getPrefix('transition', duration);
+        innerStyle = getPrefix('transition', duration);
 
         me.endEvent($inner, me.opts.duration, function (e) {
             $wrapper.replaceWith($target);
@@ -255,31 +240,19 @@
             switch (direction) {
                 case 'top':
                     wrapperStyle.height = $target.outerHeight() + 'px';
-                    $.extend(innerStyle, {
-                        '-webkit-transform': 'translateY(0)',
-                        'transform': 'translateY(0)'
-                    });
+                    $.extend(innerStyle, getPrefix('transform', 'translateY(0)'));
                     break;
                 case 'bottom':
                     wrapperStyle.height = $target.outerHeight() + 'px';
-                    $.extend(innerStyle, {
-                        '-webkit-transform': 'translateY(0)',
-                        'transform': 'translateY(0)'
-                    });
+                    $.extend(innerStyle, getPrefix('transform', 'translateY(0)'));
                     break;
                 case 'left':
                     wrapperStyle.width = $target.outerWidth() + 'px';
-                    $.extend(innerStyle, {
-                        '-webkit-transform': 'translateX(0)',
-                        'transform': 'translateX(0)'
-                    });
+                    $.extend(innerStyle, getPrefix('transform', 'translateX(0)'));
                     break;
                 case 'right':
                     wrapperStyle.width = $target.outerWidth() + 'px';
-                    $.extend(innerStyle, {
-                        '-webkit-transform': 'translateX(0)',
-                        'transform': 'translateX(0)'
-                    });
+                    $.extend(innerStyle, getPrefix('transform', 'translateX(0)'));
                     break;
                 default:
                     break;
@@ -303,88 +276,63 @@
         // 动画效果
         var duration = me.opts.duration / 1000 + 's';
 
-        var wrapperStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px',
-            display: $target.css('display'),
-            top: $target.css('top'),
-            right: $target.css('right'),
-            bottom: $target.css('bottom'),
-            left: $target.css('left'),
-            overflow: 'hidden',
-            '-webkit-transition': duration,
-            'transition': duration
-        };
+        var wrapperStyle = $.extend({
+                width: $target.outerWidth() + 'px',
+                height: $target.outerHeight() + 'px',
+                display: $target.css('display'),
+                top: $target.css('top'),
+                right: $target.css('right'),
+                bottom: $target.css('bottom'),
+                left: $target.css('left')
+            },
+            getPrefix('transition', duration));
 
-        var innerStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px',
-            position: 'absolute',
-            '-webkit-transition': duration,
-            transition: duration
-        };
+        var innerStyle = $.extend({
+                width: $target.outerWidth() + 'px',
+                height: $target.outerHeight() + 'px'
+            },
+            getPrefix('transition', duration));
 
-        if ($target.css('position') !== 'static') {
+        var targetPosition = $target.css('position');
+
+        if (targetPosition !== 'static') {
             wrapperStyle.position = $target.css('position');
-        }
-        else {
-             wrapperStyle.position = 'relative';
         }
 
         var direction = me.opts.direction;
 
+        if (targetPosition === 'absolute' || targetPosition === 'fixed') {
+            wrapperStyle[direction] = 'auto';
+        }
+
         switch (direction) {
             case 'top':
                 $.extend(innerStyle, {
-                    'bottom': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateY(0)',
-                    'transform': 'translateY(0)'
-                });
-
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.top = 'auto';
-                }
+                    bottom: 0,
+                    left: 0
+                },
+                getPrefix('transform', 'translateY(0)'));
                 break;
             case 'bottom':
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateY(0)',
-                    'transform': 'translateY(0)'
-                });
-
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.bottom = 'auto';
-                }
+                    top: 0,
+                    left: 0
+                },
+                getPrefix('transform', 'translateY(0)'));
                 break;
             case 'left':
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'right': 0,
-                    '-webkit-transform': 'translateX(0)',
-                    'transform': 'translateX(0)'
-                });
-
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.left = 'auto';
-                }
+                    top: 0,
+                    right: 0
+                },
+                getPrefix('transform', 'translateX(0)'));
                 break;
             case 'right':
                 $.extend(innerStyle, {
-                    'top': 0,
-                    'left': 0,
-                    '-webkit-transform': 'translateX(0)',
-                    'transform': 'translateX(0)'
-                });
-
-                if ($target.css('position') === 'absolute'
-                    || $target.css('position') === 'fixed') {
-                    wrapperStyle.right = 'auto';
-                }
+                    top: 0,
+                    left: 0
+                },
+                getPrefix('transform', 'translatex(0)'));
                 break;
             default:
                 break;
@@ -397,14 +345,28 @@
 
         var $inner = $('.w-drawer-inner', $wrapper);
 
-        var targetStyle = {
-            position: 'static',
-            width: $target.css('width'),
-            height: $target.css('height')
-        };
+        var targetStyle;
+
+        if ($target.css('box-sizing') === 'border-box') {
+            targetStyle = {
+                width: $target.outerWidth() + 'px',
+                height: $target.outerHeight() + 'px'
+            };
+        }
+        else {
+            targetStyle = {
+                width: $target.css('width'),
+                height: $target.css('height')
+            };
+        }
+
         // 插入wrapper
         $wrapper.insertAfter($target.css(targetStyle));
         $inner.append($target);
+
+        if (targetPosition !== 'static') {
+            $target.css('position', 'static');
+        }
 
         me.endEvent($inner, me.opts.duration, function (e) {
             processStyle($target, me.opts.showOption, 'hide');
@@ -419,43 +381,31 @@
             switch (direction) {
                 case 'top':
                     wrapperStyle = {
-                        'height': 0
+                        height: 0
                     };
 
-                    innerStyle = {
-                        '-webkit-transform': 'translateY(100%)',
-                        'transform': 'translateY(100%)'
-                    };
+                    innerStyle = getPrefix('transform', 'translateY(100%)');
                     break;
                 case 'bottom':
                     wrapperStyle = {
-                        'height': 0
+                        height: 0
                     };
 
-                    innerStyle = {
-                        '-webkit-transform': 'translateY(-100%)',
-                        'transform': 'translateY(-100%)'
-                    };
+                    innerStyle = getPrefix('transform', 'translateY(-100%)');
                     break;
                 case 'left':
                     wrapperStyle = {
-                        'width': 0
+                        width: 0
                     };
 
-                    innerStyle = {
-                        '-webkit-transform': 'translateX(100%)',
-                        'transform': 'translateX(100%)'
-                    };
+                    innerStyle = getPrefix('transform', 'translateX(100%)');
                     break;
                 case 'right':
                     wrapperStyle = {
-                        'width': 0
+                        width: 0
                     };
 
-                    innerStyle = {
-                        '-webkit-transform': 'translateX(-100%)',
-                        'transform': 'translateX(-100%)'
-                    };
+                    innerStyle = getPrefix('transform', 'translateX(-100%)');
                     break;
                 default:
                     break;
@@ -510,8 +460,14 @@
             background: 'transparent'
         };
 
-        var wrapperStyle = $.extend({}, defaultStyle, styleOpts && styleOpts.wrapper);
-        var innerStyle = $.extend({}, defaultStyle, styleOpts && styleOpts.inner);
+        var wrapperStyle = $.extend({
+                position: 'relative'
+            },
+            defaultStyle, styleOpts && styleOpts.wrapper);
+        var innerStyle = $.extend({
+                position: 'absolute'
+            },
+            defaultStyle, styleOpts && styleOpts.inner);
 
         // 防止外部定义样式污染
         return $('<div class="w-drawer-wrapper" '
@@ -552,10 +508,10 @@
 
     function dasherize(str) {
         return str.replace(/::/g, '/')
-           .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-           .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-           .replace(/_/g, '-')
-           .toLowerCase();
+            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+            .replace(/_/g, '-')
+            .toLowerCase();
     }
 
     function removeStyle($dom, excludeList) {
@@ -574,6 +530,19 @@
         }
 
         $dom.attr('style', styleStr);
+    }
+
+    var PREFIX = ['webkit'];
+
+    function getPrefix(name, value) {
+        var result = {};
+        result[name] = value;
+
+        for (var i = 0, max = PREFIX.length; i < max; i++) {
+            result['-' + PREFIX[i] + '-' + name] = value;
+        }
+
+        return result;
     }
 
     function processStyle($dom, showOption, type) {

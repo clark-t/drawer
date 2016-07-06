@@ -1,3 +1,9 @@
+/**
+ * @file index.js
+ * @author clarkt(clarktanglei@163.com)
+ */
+
+/* globals Drawer */
 (function () {
     var $block = $('.block-1');
     var $button = $('button', $block);
@@ -8,7 +14,7 @@
         duration: 500,
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -29,7 +35,7 @@
         direction: 'bottom',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -50,7 +56,7 @@
         direction: 'top',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -71,7 +77,7 @@
         direction: 'top',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -92,7 +98,7 @@
         direction: 'right',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -113,7 +119,7 @@
         direction: 'right',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -134,7 +140,7 @@
         direction: 'left',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });
@@ -155,7 +161,7 @@
         direction: 'left',
         showOption: {
             remove: {
-                class: 'hide'
+                'class': 'hide'
             }
         }
     });

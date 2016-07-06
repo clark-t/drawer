@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="en">
+<head>
     <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <title>test</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <!-- htmlcs-disable -->
     <style>
+        /* csshint-disable */
         html {
             padding: 0;
             margin: 0;
@@ -145,97 +148,98 @@
             top: 0;
         }
     </style>
-    </head>
-    <body>
-        <div class="block block-1">
-            <span class="title">in document flow bottom</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <!-- htmlcs-enable -->
+</head>
+<body>
+    <div class="block block-1">
+        <span class="title">in document flow bottom</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-2">
-            <span class="title">out of document flow bottom</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-2">
+        <span class="title">out of document flow bottom</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-3">
-            <span class="title">in document flow top</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-3">
+        <span class="title">in document flow top</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-4">
-            <span class="title">out of document flow top</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-4">
+        <span class="title">out of document flow top</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-5">
-            <span class="title">in document flow right</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-5">
+        <span class="title">in document flow right</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-6">
-            <span class="title">out of document flow right</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-6">
+        <span class="title">out of document flow right</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-7">
-            <span class="title">in document flow left</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide" style="background: #0f0">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-7">
+        <span class="title">in document flow left</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide" style="background: #0f0">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
+    </div>
 
-        <div class="block block-8">
-            <span class="title">out of document flow left</span>
-            <button>toggle</button>
-            <div class="section section-1">
-                <div class="target hide" style="background: #0f0">
-                    <div class="child-1"></div>
-                    <div class="child-2"></div>
-                </div>
+    <div class="block block-8">
+        <span class="title">out of document flow left</span>
+        <button type="button">toggle</button>
+        <div class="section section-1">
+            <div class="target hide" style="background: #0f0">
+                <div class="child-1"></div>
+                <div class="child-2"></div>
             </div>
         </div>
-        <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
-        <script src="../drawer.js"></script>
-        <script src='./index.js'></script>
-    </body>
+    </div>
+    <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <script src="../drawer.js"></script>
+    <script src="./index.js"></script>
+</body>
 </html>
