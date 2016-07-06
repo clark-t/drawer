@@ -100,8 +100,6 @@
             wrapperStyle.position = targetPosition;
         }
 
-        // innerStyle.height = $parent.outerHeight() + 'px';
-
         var $wrapper = getWrapper({
             wrapper: wrapperStyle,
             inner: innerStyle
@@ -452,6 +450,7 @@
     };
 
     function getWrapper(styleOpts) {
+        // 防止外部定义样式污染
         var defaultStyle = {
             margin: 0,
             padding: 0,
@@ -469,7 +468,6 @@
             },
             defaultStyle, styleOpts && styleOpts.inner);
 
-        // 防止外部定义样式污染
         return $('<div class="w-drawer-wrapper" '
             + 'style="' + getStyleString(wrapperStyle) + '">'
             + '<div class="w-drawer-inner" '
