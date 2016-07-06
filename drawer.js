@@ -455,12 +455,12 @@
             margin: 0,
             padding: 0,
             border: 'none',
-            overflow: 'hidden',
             background: 'transparent'
         };
 
         var wrapperStyle = $.extend({
-                position: 'relative'
+                position: 'relative',
+                overflow: 'hidden'
             },
             defaultStyle, styleOpts && styleOpts.wrapper);
         var innerStyle = $.extend({
