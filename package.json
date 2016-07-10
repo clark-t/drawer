@@ -1,0 +1,22 @@
+{
+  "name": "drawer",
+  "version": "1.0.0",
+  "description": "an animation library to make dom show up like drawer.",
+  "scripts": {},
+  "dependencies": {},
+  "author": "clarkt (clarktanglei@163.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clark-t/drawer.git"
+  },
+  "license": "BSD",
+  "devDependencies": {},
+  "keywords": [
+    "drawer",
+    "animation"
+  ],
+  "main": "drawer.js",
+  "directories": {
+    "test": "tests"
+  }
+}
