@@ -462,6 +462,7 @@
                 position: 'relative',
                 overflow: 'hidden'
             },
+            getPrefix('translateZ', 0),
             defaultStyle, styleOpts && styleOpts.wrapper);
         var innerStyle = $.extend({
                 position: 'absolute'
