@@ -13,7 +13,9 @@
   "devDependencies": {},
   "keywords": [
     "drawer",
-    "animation"
+    "animation",
+    "javascript",
+    "js"
   ],
   "main": "drawer.js",
   "directories": {
