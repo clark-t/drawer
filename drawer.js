@@ -40,23 +40,35 @@
     };
 
     function getOpts(opts) {
-        var result = {};
-
-        for (var i = 0, max = OPTION_MAP.length; i < max; i++) {
-            if (opts[OPTION_MAP[i]] != null) {
-                result[OPTION_MAP[i]] = opts[OPTION_MAP[i]];
+        return OPTION_MAP.reduce(function (res, opt) {
+            if (opts[opt] != null) {
+                res[opt] = opts[opt];
             }
-            else if (OPTION_DEFAULT[OPTION_MAP[i]] != null) {
-                result[OPTION_MAP[i]] = OPTION_DEFAULT[OPTION_MAP[i]];
+            else if (OPTION_DEFAULT[opt]) {
+                res[opt] = OPTION_DEFAULT[opt];
             }
-        }
 
-        return result;
+            return res;
+        }, {});
+
+        // var result = {};
+
+        // for (var i = 0, max = OPTION_MAP.length; i < max; i++) {
+        //     if (opts[OPTION_MAP[i]] != null) {
+        //         result[OPTION_MAP[i]] = opts[OPTION_MAP[i]];
+        //     }
+        //     else if (OPTION_DEFAULT[OPTION_MAP[i]] != null) {
+        //         result[OPTION_MAP[i]] = OPTION_DEFAULT[OPTION_MAP[i]];
+        //     }
+        // }
+
+        // return result;
     }
 
     Drawer.prototype.show = function () {
         if (this.status !== 'ready'
-            || this.opts.$target.css('display') !== 'none') {
+            || this.opts.$target.css('display') !== 'none'
+        ) {
             return;
         }
 
@@ -83,12 +95,13 @@
 
         innerStyle.margin = (' ' + innerStyle.padding)
             .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
-                if (!$2 || $2 === '+') {
-                    $2 = '-';
-                }
-                else {
-                    $2 = '+';
-                }
+                $2 = !$2 || $2 === '+' ? '_' : '+';
+                // if (!$2 || $2 === '+') {
+                //     $2 = '-';
+                // }
+                // else {
+                //     $2 = '+';
+                // }
 
                 return $1 + $2 + $3;
             })
