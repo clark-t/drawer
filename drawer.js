@@ -458,16 +458,23 @@
             background: 'transparent'
         };
 
-        var wrapperStyle = $.extend({
+        var wrapperStyle = $.extend(
+            {
                 position: 'relative',
                 overflow: 'hidden'
             },
             getPrefix('translateZ', 0),
-            defaultStyle, styleOpts && styleOpts.wrapper);
-        var innerStyle = $.extend({
+            defaultStyle,
+            styleOpts && styleOpts.wrapper
+        );
+
+        var innerStyle = $.extend(
+            {
                 position: 'absolute'
             },
-            defaultStyle, styleOpts && styleOpts.inner);
+            defaultStyle,
+            styleOpts && styleOpts.inner
+        );
 
         return $('<div class="w-drawer-wrapper" '
             + 'style="' + getStyleString(wrapperStyle) + '">'
