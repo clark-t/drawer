@@ -40,23 +40,24 @@
     };
 
     function getOpts(opts) {
-        var result = {};
-
-        for (var i = 0, max = OPTION_MAP.length; i < max; i++) {
-            if (opts[OPTION_MAP[i]] != null) {
-                result[OPTION_MAP[i]] = opts[OPTION_MAP[i]];
-            }
-            else if (OPTION_DEFAULT[OPTION_MAP[i]] != null) {
-                result[OPTION_MAP[i]] = OPTION_DEFAULT[OPTION_MAP[i]];
-            }
-        }
-
-        return result;
+        return OPTION_MAP.reduce(function (res, name) {
+            res[name] = opts[name] || OPTION_DEFAULT[name];
+            return res;
+        }, {});
     }
 
+    // Drawer.prototype.processOpts = function () {
+    //     var me = this;
+    //     var $target = me.opts.$target;
+    //     var $parent = $target.parent();
+    // };
+
+    // function getDirectionStyle() {
+
+    // }
+
     Drawer.prototype.show = function () {
-        if (this.status !== 'ready'
-            || this.opts.$target.css('display') !== 'none') {
+        if (this.status !== 'ready' || this.opts.$target.css('display') !== 'none') {
             return;
         }
 
@@ -83,13 +84,7 @@
 
         innerStyle.margin = (' ' + innerStyle.padding)
             .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
-                if (!$2 || $2 === '+') {
-                    $2 = '-';
-                }
-                else {
-                    $2 = '+';
-                }
-
+                $2 = !$2 || $2 === '+' ? '-' : '+';
                 return $1 + $2 + $3;
             })
             .replace(/^ /, '');
@@ -118,7 +113,8 @@
 
         if ($target.width() === 0
             && $target.css('display') === 'block'
-            && $target.css('float') === 'none') {
+            && $target.css('float') === 'none'
+        ) {
             $target.css('float', 'left');
             isFloat = true;
         }
@@ -262,8 +258,7 @@
     };
 
     Drawer.prototype.hide = function () {
-        if (this.status !== 'ready'
-            || this.opts.$target.css('display') === 'none') {
+        if (this.status !== 'ready' || this.opts.$target.css('display') === 'none') {
             return;
         }
 
@@ -274,7 +269,8 @@
         // 动画效果
         var duration = me.opts.duration / 1000 + 's';
 
-        var wrapperStyle = $.extend({
+        var wrapperStyle = $.extend(
+            {
                 width: $target.outerWidth() + 'px',
                 height: $target.outerHeight() + 'px',
                 display: $target.css('display'),
@@ -283,18 +279,21 @@
                 bottom: $target.css('bottom'),
                 left: $target.css('left')
             },
-            getPrefix('transition', duration));
+            getPrefix('transition', duration)
+        );
 
-        var innerStyle = $.extend({
+        var innerStyle = $.extend(
+            {
                 width: $target.outerWidth() + 'px',
                 height: $target.outerHeight() + 'px'
             },
-            getPrefix('transition', duration));
+            getPrefix('transition', duration)
+        );
 
         var targetPosition = $target.css('position');
 
         if (targetPosition !== 'static') {
-            wrapperStyle.position = $target.css('position');
+            wrapperStyle.position = targetPosition;
         }
 
         var direction = me.opts.direction;
@@ -458,16 +457,21 @@
             background: 'transparent'
         };
 
-        var wrapperStyle = $.extend({
+        var wrapperStyle = $.extend(
+            {
                 position: 'relative',
                 overflow: 'hidden'
             },
             getPrefix('translateZ', 0),
-            defaultStyle, styleOpts && styleOpts.wrapper);
-        var innerStyle = $.extend({
-                position: 'absolute'
-            },
-            defaultStyle, styleOpts && styleOpts.inner);
+            defaultStyle,
+            styleOpts && styleOpts.wrapper
+        );
+
+        var innerStyle = $.extend(
+            {position: 'absolute'},
+            defaultStyle,
+            styleOpts && styleOpts.inner
+        );
 
         return $('<div class="w-drawer-wrapper" '
             + 'style="' + getStyleString(wrapperStyle) + '">'
@@ -477,32 +481,23 @@
     }
 
     function getStyleString(styleObject) {
-        var str = '';
-
-        for (var key in styleObject) {
-            if (styleObject.hasOwnProperty(key)) {
-                str += dasherize(key) + ':' + styleObject[key] + ';';
-            }
-        }
-
-        return str;
+        return Object.keys(styleObject).reduce(function (res, key) {
+            return res + dasherize(key) + ':' + styleObject[key] + ';';
+        }, '');
     }
 
     function parseStyleString(styleString) {
-        styleString = styleString
-            .trim()
+        return styleString.trim()
             .replace(/ +(;|:) +/g, '$1')
-            .replace(/;$/, '');
-        var styleStringList = styleString.split(';');
-
-        var styleObj = {};
-
-        for (var i = 0, max = styleStringList.length; i < max; i++) {
-            var style = styleStringList[i].split(':');
-            styleObj[style[0]] = style[1];
-        }
-
-        return styleObj;
+            .replace(/;$/, '')
+            .split(';')
+            .reduce(function (res, style) {
+                    style = style.split(':');
+                    res[style[0]] = style[1];
+                    return res;
+                },
+                {}
+            );
     }
 
     function dasherize(str) {
@@ -513,35 +508,27 @@
             .toLowerCase();
     }
 
-    function removeStyle($dom, excludeList) {
-        if (typeof excludeList === 'string') {
-            excludeList = [excludeList];
-        }
-
+    function removeStyle($dom, exclude) {
+        exclude = typeof exclude === 'string' ? [exclude] : exclude;
         var styleObj = parseStyleString($dom.attr('style') || '');
-        var styleStr = '';
-
-        for (var key in styleObj) {
-            if (styleObj.hasOwnProperty(key)
-                && excludeList.indexOf(key) === -1) {
-                styleStr += key + ':' + styleObj[key] + ';';
-            }
-        }
+        var styleStr = Object.keys(styleObj)
+            .filter(function (key) {
+                return exclude.indexOf(key) === -1;
+            })
+            .reduce(function (res, key) {
+                return res + key + ':' + styleObj[key] + ';';
+            }, '');
 
         $dom.attr('style', styleStr);
     }
 
-    var PREFIX = ['webkit'];
+    var PREFIX = ['', '-webkit-'];
 
     function getPrefix(name, value) {
-        var result = {};
-        result[name] = value;
-
-        for (var i = 0, max = PREFIX.length; i < max; i++) {
-            result['-' + PREFIX[i] + '-' + name] = value;
-        }
-
-        return result;
+        return PREFIX.reduce(function (res, prefix) {
+            res[prefix + name] = value;
+            return res;
+        }, {});
     }
 
     function processStyle($dom, showOption, type) {
@@ -563,7 +550,7 @@
             if (addOption.class) {
                 var addClass = addOption.class;
 
-                if (addClass instanceof Array) {
+                if (Array.isArray(addClass)) {
                     addClass = addClass.join(' ');
                 }
 
@@ -579,7 +566,7 @@
             if (removeOption.class) {
                 var removeClass = removeOption.class;
 
-                if (removeClass instanceof Array) {
+                if (Array.isArray(removeClass)) {
                     removeClass = removeClass.join(' ');
                 }
 
@@ -602,4 +589,4 @@
         this.Drawer = Drawer;
     }
 })
-.call(this || typeof window !== 'undefined' ? window : global);
+.call(this);
