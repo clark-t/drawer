@@ -8,6 +8,7 @@
     /**
      * drawer constructor
      *
+     * @constructor
      * @param {Object} opts params
      * @param {$DOM} opts.$target $target
      * @param {string} opts.direction 'top' or 'bottom' or 'left' or 'right'
