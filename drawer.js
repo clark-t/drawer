@@ -579,7 +579,9 @@
         }
     }
 
-
+    if (typeof module !== 'undefined' && typeof exports === 'object') {
+        module.exports = Drawer;
+    }
     if (typeof define === 'function' && (define.amd || define.cmd)) {
         define(function () {
             return Drawer;
