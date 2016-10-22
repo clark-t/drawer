@@ -23,7 +23,7 @@
      * @param {Function=} opts.onChange callback function when state change finishes
      */
     function Drawer(opts) {
-        this.opts = getOpts(opts);
+        this.processOpts(opts);
         this.status = 'ready';
     }
 
@@ -47,26 +47,29 @@
         }, {});
     }
 
-    // Drawer.prototype.processOpts = function () {
-    //     var me = this;
-    //     var $target = me.opts.$target;
-    //     var $parent = $target.parent();
-    // };
+    Drawer.prototype.processOpts = function (opts) {
+        this.opts = getOpts(opts);
+        var $target = this.opts.$target;
+        var $parent = $target.parent();
 
-    // function getDirectionStyle() {
+        this.$target = $target;
+        this.$parent = $parent;
+    };
+
+    // function getDirectionStyleFunction() {
 
     // }
 
     Drawer.prototype.show = function () {
-        if (this.status !== 'ready' || this.opts.$target.css('display') !== 'none') {
+        if (this.status !== 'ready' || this.$target.css('display') !== 'none') {
             return;
         }
 
         var me = this;
         me.status = 'pending';
         var direction = me.opts.direction;
-        var $target = me.opts.$target;
-        var $parent = $target.parent();
+        var $target = me.$target;
+        var $parent = me.$parent;
 
         var originStyle = $target.attr('style') || '';
 
@@ -83,12 +86,7 @@
             height: $parent.css('height')
         };
 
-        innerStyle.margin = (' ' + innerStyle.padding)
-            .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
-                $2 = !$2 || $2 === '+' ? '-' : '+';
-                return $1 + $2 + $3;
-            })
-            .replace(/^ /, '');
+        innerStyle.margin = getOppositeStyle(innerStyle.padding);
 
         var targetPosition = $target.css('position');
 
@@ -133,6 +131,14 @@
             });
         }
 
+        if (isFloat) {
+            removeStyle($target, 'float');
+        }
+
+        if (targetPosition !== 'static') {
+            $target.css('position', 'static');
+        }
+
         wrapperStyle = {
             display: $target.css('display'),
             top: $target.css('top'),
@@ -153,54 +159,50 @@
             border: 'none'
         };
 
-        if (isFloat) {
-            removeStyle($target, 'float');
-        }
-
         switch (direction) {
             case 'top':
-                $.extend(wrapperStyle, {
+                extend(wrapperStyle, {
                     width: $target.outerWidth() + 'px',
                     height: 0
                 });
 
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                         bottom: 0,
                         left: 0
                     },
                     getPrefix('transform', 'translateY(100%)'));
                 break;
             case 'bottom':
-                $.extend(wrapperStyle, {
+                extend(wrapperStyle, {
                     width: $target.outerWidth() + 'px',
                     height: 0
                 });
 
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
                     getPrefix('transform', 'translateY(-100%)'));
                 break;
             case 'left':
-                $.extend(wrapperStyle, {
+                extend(wrapperStyle, {
                     width: 0,
                     height: $target.outerHeight() + 'px'
                 });
 
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                         top: 0,
                         right: 0
                     },
                     getPrefix('transform', 'translateX(100%)'));
                 break;
             case 'right':
-                $.extend(wrapperStyle, {
+                extend(wrapperStyle, {
                     width: 0,
                     height: $target.outerHeight() + 'px'
                 });
 
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
@@ -210,18 +212,8 @@
                 break;
         }
 
-        if (targetPosition !== 'static') {
-            $target.css('position', 'static');
-        }
-
         $wrapper.css(wrapperStyle);
         $inner.css(innerStyle);
-
-        // 动画效果
-        var duration = me.opts.duration / 1000 + 's';
-
-        wrapperStyle = getPrefix('transition', duration);
-        innerStyle = getPrefix('transition', duration);
 
         me.endEvent($inner, me.opts.duration, function (e) {
             $wrapper.replaceWith($target);
@@ -231,31 +223,35 @@
             $inner = null;
         });
 
-        setTimeout(function () {
-            switch (direction) {
-                case 'top':
-                    wrapperStyle.height = $target.outerHeight() + 'px';
-                    $.extend(innerStyle, getPrefix('transform', 'translateY(0)'));
-                    break;
-                case 'bottom':
-                    wrapperStyle.height = $target.outerHeight() + 'px';
-                    $.extend(innerStyle, getPrefix('transform', 'translateY(0)'));
-                    break;
-                case 'left':
-                    wrapperStyle.width = $target.outerWidth() + 'px';
-                    $.extend(innerStyle, getPrefix('transform', 'translateX(0)'));
-                    break;
-                case 'right':
-                    wrapperStyle.width = $target.outerWidth() + 'px';
-                    $.extend(innerStyle, getPrefix('transform', 'translateX(0)'));
-                    break;
-                default:
-                    break;
-            }
+        // 动画效果
+        var duration = me.opts.duration / 1000 + 's';
 
-            $wrapper.css(wrapperStyle);
-            $inner.css(innerStyle);
-        });
+        wrapperStyle = getPrefix('transition-duration', duration);
+        innerStyle = getPrefix('transition-duration', duration);
+
+        switch (direction) {
+            case 'top':
+                wrapperStyle.height = $target.outerHeight() + 'px';
+                extend(innerStyle, getPrefix('transform', 'translateY(0)'));
+                break;
+            case 'bottom':
+                wrapperStyle.height = $target.outerHeight() + 'px';
+                extend(innerStyle, getPrefix('transform', 'translateY(0)'));
+                break;
+            case 'left':
+                wrapperStyle.width = $target.outerWidth() + 'px';
+                extend(innerStyle, getPrefix('transform', 'translateX(0)'));
+                break;
+            case 'right':
+                wrapperStyle.width = $target.outerWidth() + 'px';
+                extend(innerStyle, getPrefix('transform', 'translateX(0)'));
+                break;
+            default:
+                break;
+        }
+
+        $wrapper.css(wrapperStyle);
+        $inner.css(innerStyle);
     };
 
     Drawer.prototype.hide = function () {
@@ -267,29 +263,21 @@
         me.status = 'pending';
         var $target = me.opts.$target;
         var originStyle = $target.attr('style') || '';
-        // 动画效果
-        var duration = me.opts.duration / 1000 + 's';
 
-        var wrapperStyle = $.extend(
-            {
-                width: $target.outerWidth() + 'px',
-                height: $target.outerHeight() + 'px',
-                display: $target.css('display'),
-                top: $target.css('top'),
-                right: $target.css('right'),
-                bottom: $target.css('bottom'),
-                left: $target.css('left')
-            },
-            getPrefix('transition', duration)
-        );
+        var wrapperStyle = {
+            width: $target.outerWidth() + 'px',
+            height: $target.outerHeight() + 'px',
+            display: $target.css('display'),
+            top: $target.css('top'),
+            right: $target.css('right'),
+            bottom: $target.css('bottom'),
+            left: $target.css('left')
+        };
 
-        var innerStyle = $.extend(
-            {
-                width: $target.outerWidth() + 'px',
-                height: $target.outerHeight() + 'px'
-            },
-            getPrefix('transition', duration)
-        );
+        var innerStyle = {
+            width: $target.outerWidth() + 'px',
+            height: $target.outerHeight() + 'px'
+        };
 
         var targetPosition = $target.css('position');
 
@@ -305,28 +293,28 @@
 
         switch (direction) {
             case 'top':
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                     bottom: 0,
                     left: 0
                 },
                 getPrefix('transform', 'translateY(0)'));
                 break;
             case 'bottom':
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                     top: 0,
                     left: 0
                 },
                 getPrefix('transform', 'translateY(0)'));
                 break;
             case 'left':
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                     top: 0,
                     right: 0
                 },
                 getPrefix('transform', 'translateX(0)'));
                 break;
             case 'right':
-                $.extend(innerStyle, {
+                extend(innerStyle, {
                     top: 0,
                     left: 0
                 },
@@ -358,13 +346,16 @@
             };
         }
 
+        if (targetPosition !== 'static') {
+            targetStyle.position = 'static';
+        }
+
         // 插入wrapper
         $wrapper.insertAfter($target.css(targetStyle));
         $inner.append($target);
-
-        if (targetPosition !== 'static') {
-            $target.css('position', 'static');
-        }
+        // @HACK 在完成插入操作后 需要强制触发一次repaint
+        // 否则transition有可能不会触发
+        $wrapper.height();
 
         me.endEvent($inner, me.opts.duration, function (e) {
             processStyle($target, me.opts.showOption, 'hide');
@@ -375,43 +366,50 @@
             me.status = 'ready';
         });
 
-        setTimeout(function () {
-            switch (direction) {
-                case 'top':
-                    wrapperStyle = {
-                        height: 0
-                    };
+        switch (direction) {
+            case 'top':
+                wrapperStyle = {
+                    height: 0
+                };
 
-                    innerStyle = getPrefix('transform', 'translateY(100%)');
-                    break;
-                case 'bottom':
-                    wrapperStyle = {
-                        height: 0
-                    };
+                innerStyle = getPrefix('transform', 'translateY(100%)');
+                break;
 
-                    innerStyle = getPrefix('transform', 'translateY(-100%)');
-                    break;
-                case 'left':
-                    wrapperStyle = {
-                        width: 0
-                    };
+            case 'bottom':
+                wrapperStyle = {
+                    height: 0
+                };
 
-                    innerStyle = getPrefix('transform', 'translateX(100%)');
-                    break;
-                case 'right':
-                    wrapperStyle = {
-                        width: 0
-                    };
+                innerStyle = getPrefix('transform', 'translateY(-100%)');
+                break;
 
-                    innerStyle = getPrefix('transform', 'translateX(-100%)');
-                    break;
-                default:
-                    break;
-            }
+            case 'left':
+                wrapperStyle = {
+                    width: 0
+                };
 
-            $wrapper.css(wrapperStyle);
-            $inner.css(innerStyle);
-        });
+                innerStyle = getPrefix('transform', 'translateX(100%)');
+                break;
+
+            case 'right':
+                wrapperStyle = {
+                    width: 0
+                };
+
+                innerStyle = getPrefix('transform', 'translateX(-100%)');
+                break;
+
+            default:
+                break;
+        }
+
+        // 动画效果
+        var duration = me.opts.duration / 1000 + 's';
+        extend(wrapperStyle, getPrefix('transition-duration', duration));
+        extend(innerStyle, getPrefix('transition-duration', duration));
+
+        $wrapper.css(wrapperStyle);
+        $inner.css(innerStyle);
     };
 
     Drawer.prototype.toggle = function () {
@@ -458,7 +456,7 @@
             background: 'transparent'
         };
 
-        var wrapperStyle = $.extend(
+        var wrapperStyle = extend(
             {
                 position: 'relative',
                 overflow: 'hidden'
@@ -468,7 +466,7 @@
             styleOpts && styleOpts.wrapper
         );
 
-        var innerStyle = $.extend(
+        var innerStyle = extend(
             {position: 'absolute'},
             defaultStyle,
             styleOpts && styleOpts.inner
@@ -496,9 +494,7 @@
                     style = style.split(':');
                     res[style[0]] = style[1];
                     return res;
-                },
-                {}
-            );
+                }, {});
     }
 
     function dasherize(str) {
@@ -530,6 +526,15 @@
             res[prefix + name] = value;
             return res;
         }, {});
+    }
+
+    function getOppositeStyle(style) {
+        return (' ' + style)
+            .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
+                $2 = !$2 || $2 === '+' ? '-' : '+';
+                return $1 + $2 + $3;
+            })
+            .replace(/^ /, '');
     }
 
     function processStyle($dom, showOption, type) {
@@ -578,6 +583,24 @@
                 removeStyle($dom, removeOption.style);
             }
         }
+    }
+
+    function extend() {
+        if (arguments[0] == null) {
+            return arguments[0];
+        }
+
+        return Array.prototype.slice.call(arguments, 0)
+            .reduce(function (res, ext) {
+                if (ext == null) {
+                    return res;
+                }
+
+                return Object.keys(ext).reduce(function (res, key) {
+                    res[key] = ext[key];
+                    return res;
+                }, res);
+            });
     }
 
     if (typeof module !== 'undefined' && typeof exports === 'object') {

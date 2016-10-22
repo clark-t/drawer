@@ -11,7 +11,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 500,
+        duration: 200,
         showOption: {
             remove: {
                 'class': 'hide'
@@ -136,7 +136,7 @@
 
     var drawer = new Drawer({
         $target: $target,
-        duration: 500,
+        duration: 200,
         direction: 'left',
         showOption: {
             remove: {
