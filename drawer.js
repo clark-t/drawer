@@ -80,15 +80,15 @@
         };
 
         var innerStyle = {
-            padding: $parent.css('padding'),
-            border: $parent.css('border'),
-            width: $parent.css('width'),
-            height: $parent.css('height')
+            padding: css($parent[0], 'padding'),
+            border: css($parent[0], 'border'),
+            width: css($parent[0], 'width'),
+            height: css($parent[0], 'height')
         };
 
         innerStyle.margin = getOppositeStyle(innerStyle.padding);
 
-        var targetPosition = $target.css('position');
+        var targetPosition = css($target[0], 'position');
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
             wrapperStyle.position = targetPosition;
@@ -106,33 +106,33 @@
         $inner.append($target);
 
         processStyle($target, me.opts.showOption, 'show');
-        removeStyle($wrapper, 'display');
+        removeStyle($wrapper[0], 'display');
 
         var isFloat = false;
 
         if ($target.width() === 0
-            && $target.css('display') === 'block'
-            && $target.css('float') === 'none'
+            && css($target[0], 'display') === 'block'
+            && css($target[0], 'float') === 'none'
         ) {
-            $target.css('float', 'left');
+            css($target[0], 'float', 'left');
             isFloat = true;
         }
 
-        if ($target.css('box-sizing') === 'border-box') {
+        if (css($target[0], 'box-sizing') === 'border-box') {
             $target.css({
-                width: $target.outerWidth() + 'px',
-                height: $target.outerHeight() + 'px'
+                width: outerWidth($target[0]) + 'px',
+                height: outerHeight($target[0]) + 'px'
             });
         }
         else {
             $target.css({
-                width: $target.width() + 'px',
-                height: $target.height() + 'px'
+                width: width($target[0]) + 'px',
+                height: height($target[0]) + 'px'
             });
         }
 
         if (isFloat) {
-            removeStyle($target, 'float');
+            removeStyle($target[0], 'float');
         }
 
         if (targetPosition !== 'static') {
@@ -152,8 +152,8 @@
         }
 
         innerStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px',
+            width: outerWidth($target[0]) + 'px',
+            height: outerHeight($target[0]) + 'px',
             margin: 0,
             padding: 0,
             border: 'none'
@@ -162,7 +162,7 @@
         switch (direction) {
             case 'top':
                 extend(wrapperStyle, {
-                    width: $target.outerWidth() + 'px',
+                    width: outerWidth($target[0]) + 'px',
                     height: 0
                 });
 
@@ -174,7 +174,7 @@
                 break;
             case 'bottom':
                 extend(wrapperStyle, {
-                    width: $target.outerWidth() + 'px',
+                    width: outerWidth($target[0]) + 'px',
                     height: 0
                 });
 
@@ -187,7 +187,7 @@
             case 'left':
                 extend(wrapperStyle, {
                     width: 0,
-                    height: $target.outerHeight() + 'px'
+                    height: outerHeight($target[0]) + 'px'
                 });
 
                 extend(innerStyle, {
@@ -199,7 +199,7 @@
             case 'right':
                 extend(wrapperStyle, {
                     width: 0,
-                    height: $target.outerHeight() + 'px'
+                    height: outerHeight($target[0]) + 'px'
                 });
 
                 extend(innerStyle, {
@@ -231,19 +231,19 @@
 
         switch (direction) {
             case 'top':
-                wrapperStyle.height = $target.outerHeight() + 'px';
+                wrapperStyle.height = outerHeight($target[0]) + 'px',
                 extend(innerStyle, getPrefix('transform', 'translateY(0)'));
                 break;
             case 'bottom':
-                wrapperStyle.height = $target.outerHeight() + 'px';
+                wrapperStyle.height = outerHeight($target[0]) + 'px';
                 extend(innerStyle, getPrefix('transform', 'translateY(0)'));
                 break;
             case 'left':
-                wrapperStyle.width = $target.outerWidth() + 'px';
+                wrapperStyle.width = outerWidth($target[0]) + 'px';
                 extend(innerStyle, getPrefix('transform', 'translateX(0)'));
                 break;
             case 'right':
-                wrapperStyle.width = $target.outerWidth() + 'px';
+                wrapperStyle.width = outerWidth($target[0]) + 'px';
                 extend(innerStyle, getPrefix('transform', 'translateX(0)'));
                 break;
             default:
@@ -265,8 +265,8 @@
         var originStyle = $target.attr('style') || '';
 
         var wrapperStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px',
+            width: outerWidth($target[0]) + 'px',
+            height: outerHeight($target[0]) + 'px',
             display: $target.css('display'),
             top: $target.css('top'),
             right: $target.css('right'),
@@ -275,8 +275,8 @@
         };
 
         var innerStyle = {
-            width: $target.outerWidth() + 'px',
-            height: $target.outerHeight() + 'px'
+            width: outerWidth($target[0]) + 'px',
+            height: outerHeight($target[0]) + 'px'
         };
 
         var targetPosition = $target.css('position');
@@ -335,14 +335,14 @@
 
         if ($target.css('box-sizing') === 'border-box') {
             targetStyle = {
-                width: $target.outerWidth() + 'px',
-                height: $target.outerHeight() + 'px'
+                width: outerWidth($target[0]) + 'px',
+                height: outerHeight($target[0]) + 'px'
             };
         }
         else {
             targetStyle = {
-                width: $target.css('width'),
-                height: $target.css('height')
+                width: width($target[0]) + 'px',
+                height: height($target[0]) + 'px'
             };
         }
 
@@ -355,7 +355,7 @@
         $inner.append($target);
         // @HACK 在完成插入操作后 需要强制触发一次repaint
         // 否则transition有可能不会触发
-        $wrapper.height();
+        height($wrapper[0]);
 
         me.endEvent($inner, me.opts.duration, function (e) {
             processStyle($target, me.opts.showOption, 'hide');
@@ -505,9 +505,9 @@
             .toLowerCase();
     }
 
-    function removeStyle($dom, exclude) {
+    function removeStyle(elem, exclude) {
         exclude = typeof exclude === 'string' ? [exclude] : exclude;
-        var styleObj = parseStyleString($dom.attr('style') || '');
+        var styleObj = parseStyleString(elem.getAttribute('style') || '');
         var styleStr = Object.keys(styleObj)
             .filter(function (key) {
                 return exclude.indexOf(key) === -1;
@@ -516,7 +516,7 @@
                 return res + key + ':' + styleObj[key] + ';';
             }, '');
 
-        $dom.attr('style', styleStr);
+        elem.setAttribute('style', styleStr);
     }
 
     var PREFIX = ['', '-webkit-'];
@@ -580,7 +580,7 @@
             }
 
             if (removeOption.style) {
-                removeStyle($dom, removeOption.style);
+                removeStyle($dom[0], removeOption.style);
             }
         }
     }
@@ -601,6 +601,51 @@
                     return res;
                 }, res);
             });
+    }
+
+    function outerWidth(elem, computed) {
+        computed = computed || getComputedStyle(elem);
+        return elem.clientWidth
+            + parseFloat(computed.borderLeft)
+            + parseFloat(computed.borderRight);
+    }
+
+    function outerHeight(elem, computed) {
+        computed = computed || getComputedStyle(elem);
+        return elem.clientHeight
+            + parseFloat(computed.borderTop)
+            + parseFloat(computed.borderBottom);
+    }
+
+    function width(elem, computed) {
+        computed = computed || getComputedStyle(elem);
+        return parseFloat(computed.width);
+    }
+
+    function height(elem, computed) {
+        computed = computed || getComputedStyle(elem);
+        return parseFloat(computed.height);
+    }
+
+    function css(elem, name, val) {
+        if (typeof name === 'string') {
+            if (val == null) {
+                var computed = getComputedStyle(elem);
+                return computed[name];
+            }
+
+            elem.style[name] = val;
+            return;
+        }
+
+        var text = elem.getAttribute('style') || '';
+        text = !text.length || text.trim().slice(-1) === ';'
+            ? text : (text + ';');
+        text += Object.keys(name).reduce(function (res, key) {
+            return res + key + ':' + name[key] + ';';
+        }, '');
+
+        elem.getAttribute('style', text);
     }
 
     if (typeof module !== 'undefined' && typeof exports === 'object') {
