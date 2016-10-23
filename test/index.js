@@ -10,7 +10,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 200,
         showOption: {
             remove: {
@@ -30,7 +30,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'bottom',
         showOption: {
@@ -51,7 +51,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'top',
         showOption: {
@@ -72,7 +72,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'top',
         showOption: {
@@ -93,7 +93,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'right',
         showOption: {
@@ -114,7 +114,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'right',
         showOption: {
@@ -135,7 +135,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 200,
         direction: 'left',
         showOption: {
@@ -156,7 +156,7 @@
     var $target = $('.target', $block);
 
     var drawer = new Drawer({
-        $target: $target[0],
+        target: $target[0],
         duration: 500,
         direction: 'left',
         showOption: {

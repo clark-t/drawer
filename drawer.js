@@ -28,7 +28,7 @@
     }
 
     var OPTION_MAP = [
-        '$target',
+        'target',
         'direction',
         'duration',
         'showOption',
@@ -49,7 +49,7 @@
 
     Drawer.prototype.processOpts = function (opts) {
         this.opts = getOpts(opts);
-        var $target = $(this.opts.$target);
+        var $target = $(this.opts.target);
         var $parent = $target.parent();
 
         this.$target = $target;
