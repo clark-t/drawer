@@ -158,7 +158,7 @@
 
     var drawer = new Drawer({
         target: $target[0],
-        duration: 12000,
+        duration: 2000,
         direction: 'left',
         showOption: {
             remove: {
