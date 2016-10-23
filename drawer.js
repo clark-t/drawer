@@ -10,9 +10,9 @@
      *
      * @constructor
      * @param {Object} opts params
-     * @param {$DOM} opts.$target $target
-     * @param {string} opts.direction 'top' or 'bottom' or 'left' or 'right'
-     * @param {number} opts.duration duration
+     * @param {DOM} opts.target target
+     * @param {string=} opts.direction 'top' or 'bottom' or 'left' or 'right'
+     * @param {number=} opts.duration duration
      * @param {Object} opts.showOption ways to show wrapper
      * @param {Object=} opts.showOption.add which class or css should be added to show wrapper
      * @param {Array=} opts.showOption.add.class which class should be added to show wrapper
@@ -210,9 +210,10 @@
         $inner.on('webkitTransitionEnd transitionend', function (e) {
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
-            this.status = 'ready';
             $wrapper = null;
             $inner = null;
+            this.status = 'ready';
+            this.opts.onChange && this.opts.onChange('show');
         }.bind(this));
 
         // 动画效果
@@ -272,11 +273,11 @@
             wrapperStyle.position = targetPosition;
         }
 
-        var direction = this.opts.direction;
-
         if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
             wrapperStyle[direction] = 'auto';
         }
+
+        var direction = this.opts.direction;
 
         switch (direction) {
             case 'top':
@@ -343,6 +344,7 @@
             $wrapper = null;
             $inner = null;
             this.status = 'ready';
+            this.opts.onChange && this.opts.onChange('hide');
         }.bind(this));
 
         switch (direction) {
