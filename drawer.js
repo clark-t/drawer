@@ -393,7 +393,7 @@
     };
 
     Drawer.prototype.toggle = function () {
-        if (this.opts.$target.css('display') === 'none') {
+        if (this._target.css('display') === 'none') {
             this.show();
         }
         else {
@@ -510,7 +510,7 @@
     function EL(elem, root) {
         if (typeof elem === 'string') {
             if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
-                elem = (new DOMParser()).parseFromString(elem, 'text/xml');
+                elem = (new DOMParser()).parseFromString(elem, 'text/xml').childNodes[0];
             }
             else {
                 elem = (_.getDom(root) || document).querySelector(elem);
@@ -605,19 +605,18 @@
                 return this.getStyle(name);
 
             default:
-                return this.addStyle(name);
+                return this.setStyle(name);
         }
     };
 
-    EL.prototype.addStyle = function (val) {
-        var text = this.attr('style') || '';
-        text = !text.length || text.trim().slice(-1) === ';'
-            ? text : (text + ';');
-        text += Object.keys(val).reduce(function (res, key) {
-            return res + key + ':' + val[key] + ';';
-        }, '');
+    EL.prototype.setStyle = function (val) {
+        var styleObj = _.parse(this.attr('style') || '');
+        styleObj = Object.keys(val).reduce(function (res, key) {
+            res[key] = val[key];
+            return res;
+        }, styleObj);
 
-        this.attr('style', text);
+        this.attr('style', _.stringify(styleObj));
         return this;
     };
 
@@ -719,8 +718,11 @@
             .replace(/;$/, '')
             .split(';')
             .reduce(function (res, style) {
-                    style = style.split(':');
-                    res[style[0]] = style[1];
+                    if (style) {
+                        style = style.split(':');
+                        res[style[0]] = style[1];
+                    }
+
                     return res;
                 }, {});
     };
