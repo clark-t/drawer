@@ -49,31 +49,25 @@
 
     Drawer.prototype.processOpts = function (opts) {
         this.opts = getOpts(opts);
-        var $target = this.opts.$target;
+        var $target = $(this.opts.$target);
         var $parent = $target.parent();
 
         this.$target = $target;
         this.$parent = $parent;
-        this._target = _($target[0]);
-        this._parent = _($parent[0]);
     };
 
-    // function getDirectionStyleFunction() {
-
-    // }
-
     Drawer.prototype.show = function () {
-        if (this.status !== 'ready' || this._target.css('display') !== 'none') {
+        if (this.status !== 'ready' || this.$target.css('display') !== 'none') {
             return;
         }
 
         var me = this;
         me.status = 'pending';
         var direction = me.opts.direction;
-        var _target = me._target;
-        var _parent = me._parent;
+        var $target = me.$target;
+        var $parent = me.$parent;
 
-        var originStyle = _target.attr('style') || '';
+        var originStyle = $target.attr('style') || '';
 
         var wrapperStyle = {
             width: 0,
@@ -81,16 +75,16 @@
             display: 'none'
         };
 
-        var innerStyle = _parent.getStyle([
+        var innerStyle = $parent.getStyle([
             'padding',
             'border',
             'width',
             'height'
         ]);
 
-        innerStyle.margin = _.inverse(innerStyle.padding);
+        innerStyle.margin = $.inverse(innerStyle.padding);
 
-        var targetPosition = _target.css('position');
+        var targetPosition = $target.css('position');
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
             wrapperStyle.position = targetPosition;
@@ -101,42 +95,41 @@
             inner: innerStyle
         });
 
-        var _wrapper = _($wrapper[0]);
-        var _inner = _('.w-drawer-inner', _wrapper);
+        var $inner = $('.w-drawer-inner', $wrapper);
 
         // 插入wrapper
-        _wrapper.insertAfter(_target);
-        _inner.append(_target);
+        $wrapper.insertAfter($target);
+        $inner.append($target);
 
         this.display('show');
-        _wrapper.removeStyle('display');
+        $wrapper.removeStyle('display');
 
         var isFloat = false;
 
-        if (_target.width() === 0
-            && _target.css('display') === 'block'
-            && _target.css('float') === 'none'
+        if ($target.width() === 0
+            && $target.css('display') === 'block'
+            && $target.css('float') === 'none'
         ) {
-            _target.css('float', 'left');
+            $target.css('float', 'left');
             isFloat = true;
         }
 
-        if (_target.css('box-sizing') === 'border-box') {
-            _target.css(_target.outerSize(true));
+        if ($target.css('box-sizing') === 'border-box') {
+            $target.css($target.outerSize(true));
         }
         else {
-            _target.css(_target.size(true));
+            $target.css($target.size(true));
         }
 
         if (isFloat) {
-            _target.removeStyle('float');
+            $target.removeStyle('float');
         }
 
         if (targetPosition !== 'static') {
-            _target.css('position', 'static');
+            $target.css('position', 'static');
         }
 
-        wrapperStyle = _target.getStyle([
+        wrapperStyle = $target.getStyle([
             'display',
             'top',
             'bottom',
@@ -148,136 +141,135 @@
             wrapperStyle[direction] = 'auto';
         }
 
-        innerStyle = extend({
+        innerStyle = $.extend({
                 margin: 0,
                 padding: 0,
                 border: 'none'
             },
-            _target.outerSize(true)
+            $target.outerSize(true)
         );
 
         switch (direction) {
             case 'top':
-                extend(wrapperStyle, {
-                    width: _target.outerWidth(true),
+                $.extend(wrapperStyle, {
+                    width: $target.outerWidth(true),
                     height: 0
                 });
 
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         bottom: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translateY(100%)')
+                    $.prefix('transform', 'translateY(100%)')
                 );
                 break;
             case 'bottom':
-                extend(wrapperStyle, {
-                    width: _target.outerWidth(true),
+                $.extend(wrapperStyle, {
+                    width: $target.outerWidth(true),
                     height: 0
                 });
 
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translateY(-100%)')
+                    $.prefix('transform', 'translateY(-100%)')
                 );
                 break;
             case 'left':
-                extend(wrapperStyle, {
+                $.extend(wrapperStyle, {
                     width: 0,
-                    height: _target.outerHeight(true)
+                    height: $target.outerHeight(true)
                 });
 
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         right: 0
                     },
-                    _.prefix('transform', 'translateX(100%)')
+                    $.prefix('transform', 'translateX(100%)')
                 );
                 break;
             case 'right':
-                extend(wrapperStyle, {
+                $.extend(wrapperStyle, {
                     width: 0,
-                    height: _target.outerHeight(true)
+                    height: $target.outerHeight(true)
                 });
 
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translateX(-100%)')
+                    $.prefix('transform', 'translateX(-100%)')
                 );
                 break;
             default:
                 break;
         }
 
-        _wrapper.css(wrapperStyle);
-        _inner.css(innerStyle);
+        $wrapper.css(wrapperStyle);
+        $inner.css(innerStyle);
 
-        _inner.on('webkitTransitionEnd transitionend', function (e) {
-            _wrapper.replaceWith(_target);
-            _target.attr('style', originStyle);
+        $inner.on('webkitTransitionEnd transitionend', function (e) {
+            $wrapper.replaceWith($target);
+            $target.attr('style', originStyle);
             me.status = 'ready';
             $wrapper = null;
-            _wrapper = null;
-            _inner = null;
+            $inner = null;
         });
 
         // 动画效果
         var duration = me.opts.duration + 'ms';
 
-        wrapperStyle = _.prefix('transition-duration', duration);
-        innerStyle = _.prefix('transition-duration', duration);
+        wrapperStyle = $.prefix('transition-duration', duration);
+        innerStyle = $.prefix('transition-duration', duration);
 
         switch (direction) {
             case 'top':
-                wrapperStyle.height = _target.outerHeight(true),
-                extend(innerStyle, _.prefix('transform', 'translateY(0)'));
+                wrapperStyle.height = $target.outerHeight(true),
+                $.extend(innerStyle, $.prefix('transform', 'translateY(0)'));
                 break;
             case 'bottom':
-                wrapperStyle.height = _target.outerHeight(true);
-                extend(innerStyle, _.prefix('transform', 'translateY(0)'));
+                wrapperStyle.height = $target.outerHeight(true);
+                $.extend(innerStyle, $.prefix('transform', 'translateY(0)'));
                 break;
             case 'left':
-                wrapperStyle.width = _target.outerWidth(true);
-                extend(innerStyle, _.prefix('transform', 'translateX(0)'));
+                wrapperStyle.width = $target.outerWidth(true);
+                $.extend(innerStyle, $.prefix('transform', 'translateX(0)'));
                 break;
             case 'right':
-                wrapperStyle.width = _target.outerWidth(true);
-                extend(innerStyle, _.prefix('transform', 'translateX(0)'));
+                wrapperStyle.width = $target.outerWidth(true);
+                $.extend(innerStyle, $.prefix('transform', 'translateX(0)'));
                 break;
             default:
                 break;
         }
 
-        _wrapper.css(wrapperStyle);
-        _inner.css(innerStyle);
+        $wrapper.css(wrapperStyle);
+        $inner.css(innerStyle);
     };
 
     Drawer.prototype.hide = function () {
-        if (this.status !== 'ready' || this._target.css('display') === 'none') {
+        if (this.status !== 'ready' || this.$target.css('display') === 'none') {
             return;
         }
 
         var me = this;
         me.status = 'pending';
-        var _target = me._target;
-        var originStyle = _target.attr('style') || '';
+        var $target = me.$target;
+        var originStyle = $target.attr('style') || '';
 
-        var wrapperStyle = extend(_target.getStyle([
+        var wrapperStyle = $.extend($target.getStyle([
                 'display',
                 'top',
                 'right',
                 'bottom',
                 'left'
             ]),
-            _target.outerSize(true)
+            $target.outerSize(true)
         );
 
-        var innerStyle = _target.outerSize(true);
-        var targetPosition = _target.css('position');
+        var innerStyle = $target.outerSize(true);
+        var targetPosition = $target.css('position');
 
         if (targetPosition !== 'static') {
             wrapperStyle.position = targetPosition;
@@ -291,35 +283,35 @@
 
         switch (direction) {
             case 'top':
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         bottom: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translateY(0)')
+                    $.prefix('transform', 'translateY(0)')
                 );
                 break;
             case 'bottom':
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translateY(0)')
+                    $.prefix('transform', 'translateY(0)')
                 );
                 break;
             case 'left':
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         right: 0
                     },
-                    _.prefix('transform', 'translateX(0)')
+                    $.prefix('transform', 'translateX(0)')
                 );
                 break;
             case 'right':
-                extend(innerStyle, {
+                $.extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
-                    _.prefix('transform', 'translatex(0)')
+                    $.prefix('transform', 'translatex(0)')
                 );
                 break;
             default:
@@ -331,52 +323,50 @@
             inner: innerStyle
         });
 
-        var _wrapper = _($wrapper[0]);
-        var _inner = _('.w-drawer-inner', _wrapper);
+        var $inner = $('.w-drawer-inner', $wrapper);
 
-        var targetStyle = _target.css('box-sizing') === 'border-box'
-            ? _target.outerSize(true) : _target.size(true);
+        var targetStyle = $target.css('box-sizing') === 'border-box'
+            ? $target.outerSize(true) : $target.size(true);
 
         if (targetPosition !== 'static') {
             targetStyle.position = 'static';
         }
 
         // 插入wrapper
-        _wrapper.insertAfter(_target.css(targetStyle));
-        _inner.append(_target);
+        $wrapper.insertAfter($target.css(targetStyle));
+        $inner.append($target);
         // @HACK 在完成插入操作后 需要强制触发一次repaint
         // 否则transition有可能不会触发
-        _wrapper.height();
+        $wrapper.height();
 
-        _inner.on('webkitTransitionEnd transitionend', function (e) {
+        $inner.on('webkitTransitionEnd transitionend', function (e) {
             me.display('hide');
-            _wrapper.replaceWith(_target);
-            _target.attr('style', originStyle);
+            $wrapper.replaceWith($target);
+            $target.attr('style', originStyle);
             $wrapper = null;
-            _wrapper = null;
-            _inner = null;
+            $inner = null;
             me.status = 'ready';
         });
 
         switch (direction) {
             case 'top':
                 wrapperStyle = {height: 0};
-                innerStyle = _.prefix('transform', 'translateY(100%)');
+                innerStyle = $.prefix('transform', 'translateY(100%)');
                 break;
 
             case 'bottom':
                 wrapperStyle = {height: 0};
-                innerStyle = _.prefix('transform', 'translateY(-100%)');
+                innerStyle = $.prefix('transform', 'translateY(-100%)');
                 break;
 
             case 'left':
                 wrapperStyle = {width: 0};
-                innerStyle = _.prefix('transform', 'translateX(100%)');
+                innerStyle = $.prefix('transform', 'translateX(100%)');
                 break;
 
             case 'right':
                 wrapperStyle = {width: 0};
-                innerStyle = _.prefix('transform', 'translateX(-100%)');
+                innerStyle = $.prefix('transform', 'translateX(-100%)');
                 break;
 
             default:
@@ -385,15 +375,15 @@
 
         // 动画效果
         var duration = me.opts.duration + 'ms';
-        extend(wrapperStyle, _.prefix('transition-duration', duration));
-        extend(innerStyle, _.prefix('transition-duration', duration));
+        $.extend(wrapperStyle, $.prefix('transition-duration', duration));
+        $.extend(innerStyle, $.prefix('transition-duration', duration));
 
-        _wrapper.css(wrapperStyle);
-        _inner.css(innerStyle);
+        $wrapper.css(wrapperStyle);
+        $inner.css(innerStyle);
     };
 
     Drawer.prototype.toggle = function () {
-        if (this._target.css('display') === 'none') {
+        if (this.$target.css('display') === 'none') {
             this.show();
         }
         else {
@@ -425,11 +415,11 @@
                     addClass = addClass.join(' ');
                 }
 
-                this._target.addClass(addClass);
+                this.$target.addClass(addClass);
             }
 
             if (addOption.style) {
-                this._target.css(addOption.style);
+                this.$target.css(addOption.style);
             }
         }
 
@@ -441,11 +431,11 @@
                     removeClass = removeClass.join(' ');
                 }
 
-                this._target.removeClass(removeClass);
+                this.$target.removeClass(removeClass);
             }
 
             if (removeOption.style) {
-                this._target.removeStyle(removeOption.style);
+                this.$target.removeStyle(removeOption.style);
             }
         }
     };
@@ -459,45 +449,27 @@
             background: 'transparent'
         };
 
-        var wrapperStyle = extend(
+        var wrapperStyle = $.extend(
             {
                 position: 'relative',
                 overflow: 'hidden'
             },
-            _.prefix('translateZ', 0),
+            $.prefix('translateZ', 0),
             defaultStyle,
             styleOpts && styleOpts.wrapper
         );
 
-        var innerStyle = extend(
+        var innerStyle = $.extend(
             {position: 'absolute'},
             defaultStyle,
             styleOpts && styleOpts.inner
         );
 
         return $('<div class="w-drawer-wrapper" '
-            + 'style="' + _.stringify(wrapperStyle) + '">'
+            + 'style="' + $.stringify(wrapperStyle) + '">'
             + '<div class="w-drawer-inner" '
-            + 'style="' + _.stringify(innerStyle) + '">'
+            + 'style="' + $.stringify(innerStyle) + '">'
             + '</div></div>');
-    }
-
-    function extend() {
-        if (arguments[0] == null) {
-            return arguments[0];
-        }
-
-        return Array.prototype.slice.call(arguments, 0)
-            .reduce(function (res, ext) {
-                if (ext == null) {
-                    return res;
-                }
-
-                return Object.keys(ext).reduce(function (res, key) {
-                    res[key] = ext[key];
-                    return res;
-                }, res);
-            });
     }
 
     /**
@@ -510,10 +482,12 @@
     function EL(elem, root) {
         if (typeof elem === 'string') {
             if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
-                elem = (new DOMParser()).parseFromString(elem, 'text/xml').childNodes[0];
+                var ele = document.createElement('div');
+                ele.innerHTML = elem;
+                elem = ele.children[0];
             }
             else {
-                elem = (_.getDom(root) || document).querySelector(elem);
+                elem = ($.getDom(root) || document).querySelector(elem);
             }
         }
 
@@ -521,6 +495,10 @@
         this.computed = getComputedStyle(elem);
         this.style = elem.style;
     }
+
+    EL.prototype.parent = function () {
+        return $(this.dom.parentNode);
+    };
 
     EL.prototype.attr = function (name, val) {
         if (val == null) {
@@ -588,7 +566,7 @@
     };
 
     EL.prototype.css = function (name, val) {
-        switch (_.instance(name)) {
+        switch ($.instance(name)) {
             case 'String':
                 if (val == null) {
                     return this.computed[name];
@@ -610,13 +588,13 @@
     };
 
     EL.prototype.setStyle = function (val) {
-        var styleObj = _.parse(this.attr('style') || '');
+        var styleObj = $.parse(this.attr('style') || '');
         styleObj = Object.keys(val).reduce(function (res, key) {
             res[key] = val[key];
             return res;
         }, styleObj);
 
-        this.attr('style', _.stringify(styleObj));
+        this.attr('style', $.stringify(styleObj));
         return this;
     };
 
@@ -629,7 +607,7 @@
 
     EL.prototype.removeStyle = function (exclude) {
         exclude = typeof exclude === 'string' ? [exclude] : exclude;
-        var styleObj = _.parse(this.attr('style') || '');
+        var styleObj = $.parse(this.attr('style') || '');
         var styleStr = Object.keys(styleObj)
             .filter(function (key) {
                 return exclude.indexOf(key) === -1;
@@ -664,7 +642,7 @@
     };
 
     EL.prototype.insertAfter = function (elem) {
-        elem = _.getDom(elem);
+        elem = $.getDom(elem);
         var parent = elem.parentNode;
 
         if (parent.lastChild === elem) {
@@ -678,13 +656,13 @@
     };
 
     EL.prototype.append = function (elem) {
-        elem = _.getDom(elem);
+        elem = $.getDom(elem);
         this.dom.appendChild(elem);
         return this;
     };
 
     EL.prototype.replaceWith = function (elem) {
-        elem = _.getDom(elem);
+        elem = $.getDom(elem);
         var parent = this.dom.parentNode;
         parent.replaceChild(elem, this.dom);
         return this;
@@ -698,7 +676,7 @@
         return this;
     };
 
-    function _(elem, root) {
+    function $(elem, root) {
         if (elem instanceof EL) {
             return elem;
         }
@@ -706,13 +684,13 @@
         return new EL(elem, root);
     }
 
-    _.stringify = function (styleObject) {
+    $.stringify = function (styleObject) {
         return Object.keys(styleObject).reduce(function (res, key) {
-            return res + _.dasherize(key) + ':' + styleObject[key] + ';';
+            return res + $.dasherize(key) + ':' + styleObject[key] + ';';
         }, '');
     };
 
-    _.parse = function (styleString) {
+    $.parse = function (styleString) {
         return styleString.trim()
             .replace(/ +(;|:) +/g, '$1')
             .replace(/;$/, '')
@@ -727,7 +705,7 @@
                 }, {});
     };
 
-    _.dasherize = function (str) {
+    $.dasherize = function (str) {
         return str.replace(/::/g, '/')
             .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
             .replace(/([a-z\d])([A-Z])/g, '$1_$2')
@@ -735,14 +713,14 @@
             .toLowerCase();
     };
 
-    _.prefix = function (name, value) {
+    $.prefix = function (name, value) {
         return ['', '-webkit-'].reduce(function (res, prefix) {
             res[prefix + name] = value;
             return res;
         }, {});
     };
 
-    _.inverse = function (style) {
+    $.inverse = function (style) {
         return (' ' + style)
             .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
                 $2 = !$2 || $2 === '+' ? '-' : '+';
@@ -751,11 +729,29 @@
             .replace(/^ /, '');
     };
 
-    _.instance = function (val) {
+    $.extend = function () {
+        if (arguments[0] == null) {
+            return arguments[0];
+        }
+
+        return Array.prototype.slice.call(arguments, 0)
+            .reduce(function (res, ext) {
+                if (ext == null) {
+                    return res;
+                }
+
+                return Object.keys(ext).reduce(function (res, key) {
+                    res[key] = ext[key];
+                    return res;
+                }, res);
+            });
+    };
+
+    $.instance = function (val) {
         return Object.prototype.toString.call(val).slice(8, -1);
     };
 
-    _.getDom = function (elem) {
+    $.getDom = function (elem) {
         if (elem instanceof EL) {
             return elem.dom;
         }
@@ -766,7 +762,7 @@
     if (typeof module !== 'undefined' && typeof exports === 'object') {
         module.exports = Drawer;
     }
-    if (typeof define === 'function' && (define.amd || define.cmd)) {
+    else if (typeof define === 'function' && (define.amd || define.cmd)) {
         define(function () {
             return Drawer;
         });
