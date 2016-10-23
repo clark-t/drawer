@@ -220,8 +220,6 @@
         }.bind(this));
 
         // 动画效果
-        // var timingFunction = this.opts.timingFunction;
-        // var duration = this.opts.duration + 'ms';
         var transition = this.opts.duration + 'ms ' + this.opts.timingFunction;
 
         wrapperStyle = $.prefix('transition', transition);
@@ -278,11 +276,11 @@
             wrapperStyle.position = targetPosition;
         }
 
+        var direction = this.opts.direction;
+
         if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
             wrapperStyle[direction] = 'auto';
         }
-
-        var direction = this.opts.direction;
 
         switch (direction) {
             case 'top':
