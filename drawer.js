@@ -61,11 +61,9 @@
             return;
         }
 
-        var me = this;
-        me.status = 'pending';
-        var direction = me.opts.direction;
-        var $target = me.$target;
-        var $parent = me.$parent;
+        this.status = 'pending';
+        var direction = this.opts.direction;
+        var $target = this.$target;
 
         var originStyle = $target.attr('style') || '';
 
@@ -75,7 +73,7 @@
             display: 'none'
         };
 
-        var innerStyle = $parent.getStyle([
+        var innerStyle = this.$parent.getStyle([
             'padding',
             'border',
             'width',
@@ -86,7 +84,7 @@
 
         var targetPosition = $target.css('position');
 
-        if (targetPosition === 'absolute' || targetPosition === 'fixed') {
+        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
             wrapperStyle.position = targetPosition;
         }
 
@@ -137,7 +135,7 @@
             'left'
         ]);
 
-        if (targetPosition === 'absolute' || targetPosition === 'fixed') {
+        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
             wrapperStyle[direction] = 'auto';
         }
 
@@ -212,13 +210,13 @@
         $inner.on('webkitTransitionEnd transitionend', function (e) {
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
-            me.status = 'ready';
+            this.status = 'ready';
             $wrapper = null;
             $inner = null;
-        });
+        }.bind(this));
 
         // 动画效果
-        var duration = me.opts.duration + 'ms';
+        var duration = this.opts.duration + 'ms';
 
         wrapperStyle = $.prefix('transition-duration', duration);
         innerStyle = $.prefix('transition-duration', duration);
@@ -253,9 +251,8 @@
             return;
         }
 
-        var me = this;
-        me.status = 'pending';
-        var $target = me.$target;
+        this.status = 'pending';
+        var $target = this.$target;
         var originStyle = $target.attr('style') || '';
 
         var wrapperStyle = $.extend($target.getStyle([
@@ -275,9 +272,9 @@
             wrapperStyle.position = targetPosition;
         }
 
-        var direction = me.opts.direction;
+        var direction = this.opts.direction;
 
-        if (targetPosition === 'absolute' || targetPosition === 'fixed') {
+        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
             wrapperStyle[direction] = 'auto';
         }
 
@@ -340,13 +337,13 @@
         $wrapper.height();
 
         $inner.on('webkitTransitionEnd transitionend', function (e) {
-            me.display('hide');
+            this.display('hide');
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
             $wrapper = null;
             $inner = null;
-            me.status = 'ready';
-        });
+            this.status = 'ready';
+        }.bind(this));
 
         switch (direction) {
             case 'top':
@@ -374,7 +371,7 @@
         }
 
         // 动画效果
-        var duration = me.opts.duration + 'ms';
+        var duration = this.opts.duration + 'ms';
         $.extend(wrapperStyle, $.prefix('transition-duration', duration));
         $.extend(innerStyle, $.prefix('transition-duration', duration));
 
