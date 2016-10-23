@@ -13,6 +13,7 @@
      * @param {DOM} opts.target target
      * @param {string=} opts.direction 'top' or 'bottom' or 'left' or 'right'
      * @param {number=} opts.duration duration
+     * @param {string=} opts.timingFunction transition timing function
      * @param {Object} opts.showOption ways to show wrapper
      * @param {Object=} opts.showOption.add which class or css should be added to show wrapper
      * @param {Array=} opts.showOption.add.class which class should be added to show wrapper
@@ -31,12 +32,14 @@
         'target',
         'direction',
         'duration',
+        'timingFunction',
         'showOption',
         'onChange'
     ];
 
     var OPTION_DEFAULT = {
         direction: 'bottom',
+        timingFunction: 'ease',
         duration: 250
     };
 
@@ -217,10 +220,12 @@
         }.bind(this));
 
         // 动画效果
-        var duration = this.opts.duration + 'ms';
+        // var timingFunction = this.opts.timingFunction;
+        // var duration = this.opts.duration + 'ms';
+        var transition = this.opts.duration + 'ms ' + this.opts.timingFunction;
 
-        wrapperStyle = $.prefix('transition-duration', duration);
-        innerStyle = $.prefix('transition-duration', duration);
+        wrapperStyle = $.prefix('transition', transition);
+        innerStyle = $.prefix('transition', transition);
 
         switch (direction) {
             case 'top':
@@ -373,9 +378,10 @@
         }
 
         // 动画效果
-        var duration = this.opts.duration + 'ms';
-        $.extend(wrapperStyle, $.prefix('transition-duration', duration));
-        $.extend(innerStyle, $.prefix('transition-duration', duration));
+        var transition = this.opts.duration + 'ms ' + this.opts.timingFunction;
+
+        $.extend(wrapperStyle, $.prefix('transition', transition));
+        $.extend(innerStyle, $.prefix('transition', transition));
 
         $wrapper.css(wrapperStyle);
         $inner.css(innerStyle);

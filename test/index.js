@@ -31,7 +31,8 @@
 
     var drawer = new Drawer({
         target: $target[0],
-        duration: 500,
+        duration: 800,
+        // timingFunction: 'linear',
         direction: 'bottom',
         showOption: {
             remove: {
@@ -157,7 +158,7 @@
 
     var drawer = new Drawer({
         target: $target[0],
-        duration: 500,
+        duration: 12000,
         direction: 'left',
         showOption: {
             remove: {
