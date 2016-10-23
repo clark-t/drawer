@@ -221,7 +221,6 @@
             _target.attr('style', originStyle);
             me.status = 'ready';
             $wrapper = null;
-            $inner = null;
             _wrapper = null;
             _inner = null;
         });
@@ -332,8 +331,8 @@
             inner: innerStyle
         });
 
-        _wrapper = _($wrapper[0]);
-        _inner = _('.w-drawer-inner', _wrapper);
+        var _wrapper = _($wrapper[0]);
+        var _inner = _('.w-drawer-inner', _wrapper);
 
         var targetStyle = _target.css('box-sizing') === 'border-box'
             ? _target.outerSize(true) : _target.size(true);
@@ -354,7 +353,6 @@
             _wrapper.replaceWith(_target);
             _target.attr('style', originStyle);
             $wrapper = null;
-            $inner = null;
             _wrapper = null;
             _inner = null;
             me.status = 'ready';
@@ -502,6 +500,13 @@
             });
     }
 
+    /**
+     * EL constructor
+     *
+     * @class
+     * @param {DOM|EL} elem HTML DOM对象
+     * @param {DOM|EL=} root 根对象
+     */
     function EL(elem, root) {
         if (typeof elem === 'string') {
             if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
