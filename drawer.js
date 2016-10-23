@@ -54,6 +54,8 @@
 
         this.$target = $target;
         this.$parent = $parent;
+        this._target = _($target[0]);
+        this._parent = _($parent[0]);
     };
 
     // function getDirectionStyleFunction() {
@@ -61,17 +63,17 @@
     // }
 
     Drawer.prototype.show = function () {
-        if (this.status !== 'ready' || this.$target.css('display') !== 'none') {
+        if (this.status !== 'ready' || this._target.css('display') !== 'none') {
             return;
         }
 
         var me = this;
         me.status = 'pending';
         var direction = me.opts.direction;
-        var $target = me.$target;
-        var $parent = me.$parent;
+        var _target = me._target;
+        var _parent = me._parent;
 
-        var originStyle = $target.attr('style') || '';
+        var originStyle = _target.attr('style') || '';
 
         var wrapperStyle = {
             width: 0,
@@ -79,16 +81,16 @@
             display: 'none'
         };
 
-        var innerStyle = {
-            padding: css($parent[0], 'padding'),
-            border: css($parent[0], 'border'),
-            width: css($parent[0], 'width'),
-            height: css($parent[0], 'height')
-        };
+        var innerStyle = _parent.getStyle([
+            'padding',
+            'border',
+            'width',
+            'height'
+        ]);
 
-        innerStyle.margin = getOppositeStyle(innerStyle.padding);
+        innerStyle.margin = _.inverse(innerStyle.padding);
 
-        var targetPosition = css($target[0], 'position');
+        var targetPosition = _target.css('position');
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
             wrapperStyle.position = targetPosition;
@@ -99,70 +101,65 @@
             inner: innerStyle
         });
 
-        var $inner = $('.w-drawer-inner', $wrapper);
+        var _wrapper = _($wrapper[0]);
+        var _inner = _('.w-drawer-inner', _wrapper);
 
         // 插入wrapper
-        $wrapper.insertAfter($target);
-        $inner.append($target);
+        _wrapper.insertAfter(_target);
+        _inner.append(_target);
 
-        processStyle($target, me.opts.showOption, 'show');
-        removeStyle($wrapper[0], 'display');
+        this.display('show');
+        _wrapper.removeStyle('display');
 
         var isFloat = false;
 
-        if ($target.width() === 0
-            && css($target[0], 'display') === 'block'
-            && css($target[0], 'float') === 'none'
+        if (_target.width() === 0
+            && _target.css('display') === 'block'
+            && _target.css('float') === 'none'
         ) {
-            css($target[0], 'float', 'left');
+            _target.css('float', 'left');
             isFloat = true;
         }
 
-        if (css($target[0], 'box-sizing') === 'border-box') {
-            $target.css({
-                width: outerWidth($target[0]) + 'px',
-                height: outerHeight($target[0]) + 'px'
-            });
+        if (_target.css('box-sizing') === 'border-box') {
+            _target.css(_target.outerSize(true));
         }
         else {
-            $target.css({
-                width: width($target[0]) + 'px',
-                height: height($target[0]) + 'px'
-            });
+            _target.css(_target.size(true));
         }
 
         if (isFloat) {
-            removeStyle($target[0], 'float');
+            _target.removeStyle('float');
         }
 
         if (targetPosition !== 'static') {
-            $target.css('position', 'static');
+            _target.css('position', 'static');
         }
 
-        wrapperStyle = {
-            display: $target.css('display'),
-            top: $target.css('top'),
-            right: $target.css('right'),
-            bottom: $target.css('bottom'),
-            left: $target.css('left')
-        };
+        wrapperStyle = _target.getStyle([
+            'display',
+            'top',
+            'bottom',
+            'right',
+            'left'
+        ]);
 
         if (targetPosition === 'absolute' || targetPosition === 'fixed') {
             wrapperStyle[direction] = 'auto';
         }
 
-        innerStyle = {
-            width: outerWidth($target[0]) + 'px',
-            height: outerHeight($target[0]) + 'px',
-            margin: 0,
-            padding: 0,
-            border: 'none'
-        };
+        innerStyle = extend({
+                margin: 0,
+                padding: 0,
+                border: 'none'
+            },
+            _target.outerSize(true)
+        );
 
         switch (direction) {
             case 'top':
                 extend(wrapperStyle, {
-                    width: outerWidth($target[0]) + 'px',
+                    width: _target.outerWidth(true),
                     height: 0
                 });
 
@@ -170,11 +167,12 @@
                         bottom: 0,
                         left: 0
                     },
-                    getPrefix('transform', 'translateY(100%)'));
+                    _.prefix('transform', 'translateY(100%)')
+                );
                 break;
             case 'bottom':
                 extend(wrapperStyle, {
-                    width: outerWidth($target[0]) + 'px',
+                    width: _target.outerWidth(true),
                     height: 0
                 });
 
@@ -182,104 +180,105 @@
                         top: 0,
                         left: 0
                     },
-                    getPrefix('transform', 'translateY(-100%)'));
+                    _.prefix('transform', 'translateY(-100%)')
+                );
                 break;
             case 'left':
                 extend(wrapperStyle, {
                     width: 0,
-                    height: outerHeight($target[0]) + 'px'
+                    height: _target.outerHeight(true)
                 });
 
                 extend(innerStyle, {
                         top: 0,
                         right: 0
                     },
-                    getPrefix('transform', 'translateX(100%)'));
+                    _.prefix('transform', 'translateX(100%)')
+                );
                 break;
             case 'right':
                 extend(wrapperStyle, {
                     width: 0,
-                    height: outerHeight($target[0]) + 'px'
+                    height: _target.outerHeight(true)
                 });
 
                 extend(innerStyle, {
                         top: 0,
                         left: 0
                     },
-                    getPrefix('transform', 'translateX(-100%)'));
+                    _.prefix('transform', 'translateX(-100%)')
+                );
                 break;
             default:
                 break;
         }
 
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        _wrapper.css(wrapperStyle);
+        _inner.css(innerStyle);
 
-        me.endEvent($inner, me.opts.duration, function (e) {
-            $wrapper.replaceWith($target);
-            $target.attr('style', originStyle);
+        _inner.on('webkitTransitionEnd transitionend', function (e) {
+            _wrapper.replaceWith(_target);
+            _target.attr('style', originStyle);
             me.status = 'ready';
             $wrapper = null;
             $inner = null;
+            _wrapper = null;
+            _inner = null;
         });
 
         // 动画效果
-        var duration = me.opts.duration / 1000 + 's';
+        var duration = me.opts.duration + 'ms';
 
-        wrapperStyle = getPrefix('transition-duration', duration);
-        innerStyle = getPrefix('transition-duration', duration);
+        wrapperStyle = _.prefix('transition-duration', duration);
+        innerStyle = _.prefix('transition-duration', duration);
 
         switch (direction) {
             case 'top':
-                wrapperStyle.height = outerHeight($target[0]) + 'px',
-                extend(innerStyle, getPrefix('transform', 'translateY(0)'));
+                wrapperStyle.height = _target.outerHeight(true),
+                extend(innerStyle, _.prefix('transform', 'translateY(0)'));
                 break;
             case 'bottom':
-                wrapperStyle.height = outerHeight($target[0]) + 'px';
-                extend(innerStyle, getPrefix('transform', 'translateY(0)'));
+                wrapperStyle.height = _target.outerHeight(true);
+                extend(innerStyle, _.prefix('transform', 'translateY(0)'));
                 break;
             case 'left':
-                wrapperStyle.width = outerWidth($target[0]) + 'px';
-                extend(innerStyle, getPrefix('transform', 'translateX(0)'));
+                wrapperStyle.width = _target.outerWidth(true);
+                extend(innerStyle, _.prefix('transform', 'translateX(0)'));
                 break;
             case 'right':
-                wrapperStyle.width = outerWidth($target[0]) + 'px';
-                extend(innerStyle, getPrefix('transform', 'translateX(0)'));
+                wrapperStyle.width = _target.outerWidth(true);
+                extend(innerStyle, _.prefix('transform', 'translateX(0)'));
                 break;
             default:
                 break;
         }
 
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        _wrapper.css(wrapperStyle);
+        _inner.css(innerStyle);
     };
 
     Drawer.prototype.hide = function () {
-        if (this.status !== 'ready' || this.opts.$target.css('display') === 'none') {
+        if (this.status !== 'ready' || this._target.css('display') === 'none') {
             return;
         }
 
         var me = this;
         me.status = 'pending';
-        var $target = me.opts.$target;
-        var originStyle = $target.attr('style') || '';
+        var _target = me._target;
+        var originStyle = _target.attr('style') || '';
 
-        var wrapperStyle = {
-            width: outerWidth($target[0]) + 'px',
-            height: outerHeight($target[0]) + 'px',
-            display: $target.css('display'),
-            top: $target.css('top'),
-            right: $target.css('right'),
-            bottom: $target.css('bottom'),
-            left: $target.css('left')
-        };
+        var wrapperStyle = extend(_target.getStyle([
+                'display',
+                'top',
+                'right',
+                'bottom',
+                'left'
+            ]),
+            _target.outerSize(true)
+        );
 
-        var innerStyle = {
-            width: outerWidth($target[0]) + 'px',
-            height: outerHeight($target[0]) + 'px'
-        };
-
-        var targetPosition = $target.css('position');
+        var innerStyle = _target.outerSize(true);
+        var targetPosition = _target.css('position');
 
         if (targetPosition !== 'static') {
             wrapperStyle.position = targetPosition;
@@ -294,31 +293,35 @@
         switch (direction) {
             case 'top':
                 extend(innerStyle, {
-                    bottom: 0,
-                    left: 0
-                },
-                getPrefix('transform', 'translateY(0)'));
+                        bottom: 0,
+                        left: 0
+                    },
+                    _.prefix('transform', 'translateY(0)')
+                );
                 break;
             case 'bottom':
                 extend(innerStyle, {
-                    top: 0,
-                    left: 0
-                },
-                getPrefix('transform', 'translateY(0)'));
+                        top: 0,
+                        left: 0
+                    },
+                    _.prefix('transform', 'translateY(0)')
+                );
                 break;
             case 'left':
                 extend(innerStyle, {
-                    top: 0,
-                    right: 0
-                },
-                getPrefix('transform', 'translateX(0)'));
+                        top: 0,
+                        right: 0
+                    },
+                    _.prefix('transform', 'translateX(0)')
+                );
                 break;
             case 'right':
                 extend(innerStyle, {
-                    top: 0,
-                    left: 0
-                },
-                getPrefix('transform', 'translatex(0)'));
+                        top: 0,
+                        left: 0
+                    },
+                    _.prefix('transform', 'translatex(0)')
+                );
                 break;
             default:
                 break;
@@ -329,74 +332,53 @@
             inner: innerStyle
         });
 
-        var $inner = $('.w-drawer-inner', $wrapper);
+        _wrapper = _($wrapper[0]);
+        _inner = _('.w-drawer-inner', _wrapper);
 
-        var targetStyle;
-
-        if ($target.css('box-sizing') === 'border-box') {
-            targetStyle = {
-                width: outerWidth($target[0]) + 'px',
-                height: outerHeight($target[0]) + 'px'
-            };
-        }
-        else {
-            targetStyle = {
-                width: width($target[0]) + 'px',
-                height: height($target[0]) + 'px'
-            };
-        }
+        var targetStyle = _target.css('box-sizing') === 'border-box'
+            ? _target.outerSize(true) : _target.size(true);
 
         if (targetPosition !== 'static') {
             targetStyle.position = 'static';
         }
 
         // 插入wrapper
-        $wrapper.insertAfter($target.css(targetStyle));
-        $inner.append($target);
+        _wrapper.insertAfter(_target.css(targetStyle));
+        _inner.append(_target);
         // @HACK 在完成插入操作后 需要强制触发一次repaint
         // 否则transition有可能不会触发
-        height($wrapper[0]);
+        _wrapper.height();
 
-        me.endEvent($inner, me.opts.duration, function (e) {
-            processStyle($target, me.opts.showOption, 'hide');
-            $wrapper.replaceWith($target);
-            $target.attr('style', originStyle);
+        _inner.on('webkitTransitionEnd transitionend', function (e) {
+            me.display('hide');
+            _wrapper.replaceWith(_target);
+            _target.attr('style', originStyle);
             $wrapper = null;
             $inner = null;
+            _wrapper = null;
+            _inner = null;
             me.status = 'ready';
         });
 
         switch (direction) {
             case 'top':
-                wrapperStyle = {
-                    height: 0
-                };
-
-                innerStyle = getPrefix('transform', 'translateY(100%)');
+                wrapperStyle = {height: 0};
+                innerStyle = _.prefix('transform', 'translateY(100%)');
                 break;
 
             case 'bottom':
-                wrapperStyle = {
-                    height: 0
-                };
-
-                innerStyle = getPrefix('transform', 'translateY(-100%)');
+                wrapperStyle = {height: 0};
+                innerStyle = _.prefix('transform', 'translateY(-100%)');
                 break;
 
             case 'left':
-                wrapperStyle = {
-                    width: 0
-                };
-
-                innerStyle = getPrefix('transform', 'translateX(100%)');
+                wrapperStyle = {width: 0};
+                innerStyle = _.prefix('transform', 'translateX(100%)');
                 break;
 
             case 'right':
-                wrapperStyle = {
-                    width: 0
-                };
-
-                innerStyle = getPrefix('transform', 'translateX(-100%)');
+                wrapperStyle = {width: 0};
+                innerStyle = _.prefix('transform', 'translateX(-100%)');
                 break;
 
             default:
@@ -404,12 +386,12 @@
         }
 
         // 动画效果
-        var duration = me.opts.duration / 1000 + 's';
-        extend(wrapperStyle, getPrefix('transition-duration', duration));
-        extend(innerStyle, getPrefix('transition-duration', duration));
+        var duration = me.opts.duration + 'ms';
+        extend(wrapperStyle, _.prefix('transition-duration', duration));
+        extend(innerStyle, _.prefix('transition-duration', duration));
 
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        _wrapper.css(wrapperStyle);
+        _inner.css(innerStyle);
     };
 
     Drawer.prototype.toggle = function () {
@@ -421,124 +403,9 @@
         }
     };
 
-    // 坑爹的transitionend不一定会触发 因此需要用个timer去做控制
-    // 参考自zepto anim方法
-    Drawer.prototype.endEvent = function ($dom, duration, callback) {
-        var fired = false;
-
-        if (duration > 0) {
-            $dom.on('webkitTransitionEnd transitionend', function (e) {
-                if (fired) {
-                    return;
-                }
-
-                fired = true;
-                callback && callback(e);
-            });
-
-            setTimeout(function (e) {
-                if (fired) {
-                    return;
-                }
-
-                fired = true;
-                callback && callback(e);
-            }, duration + 25);
-        }
-    };
-
-    function getWrapper(styleOpts) {
-        // 防止外部定义样式污染
-        var defaultStyle = {
-            margin: 0,
-            padding: 0,
-            border: 'none',
-            background: 'transparent'
-        };
-
-        var wrapperStyle = extend(
-            {
-                position: 'relative',
-                overflow: 'hidden'
-            },
-            getPrefix('translateZ', 0),
-            defaultStyle,
-            styleOpts && styleOpts.wrapper
-        );
-
-        var innerStyle = extend(
-            {position: 'absolute'},
-            defaultStyle,
-            styleOpts && styleOpts.inner
-        );
-
-        return $('<div class="w-drawer-wrapper" '
-            + 'style="' + getStyleString(wrapperStyle) + '">'
-            + '<div class="w-drawer-inner" '
-            + 'style="' + getStyleString(innerStyle) + '">'
-            + '</div></div>');
-    }
-
-    function getStyleString(styleObject) {
-        return Object.keys(styleObject).reduce(function (res, key) {
-            return res + dasherize(key) + ':' + styleObject[key] + ';';
-        }, '');
-    }
-
-    function parseStyleString(styleString) {
-        return styleString.trim()
-            .replace(/ +(;|:) +/g, '$1')
-            .replace(/;$/, '')
-            .split(';')
-            .reduce(function (res, style) {
-                    style = style.split(':');
-                    res[style[0]] = style[1];
-                    return res;
-                }, {});
-    }
-
-    function dasherize(str) {
-        return str.replace(/::/g, '/')
-            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
-            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
-            .replace(/_/g, '-')
-            .toLowerCase();
-    }
-
-    function removeStyle(elem, exclude) {
-        exclude = typeof exclude === 'string' ? [exclude] : exclude;
-        var styleObj = parseStyleString(elem.getAttribute('style') || '');
-        var styleStr = Object.keys(styleObj)
-            .filter(function (key) {
-                return exclude.indexOf(key) === -1;
-            })
-            .reduce(function (res, key) {
-                return res + key + ':' + styleObj[key] + ';';
-            }, '');
-
-        elem.setAttribute('style', styleStr);
-    }
-
-    var PREFIX = ['', '-webkit-'];
-
-    function getPrefix(name, value) {
-        return PREFIX.reduce(function (res, prefix) {
-            res[prefix + name] = value;
-            return res;
-        }, {});
-    }
-
-    function getOppositeStyle(style) {
-        return (' ' + style)
-            .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
-                $2 = !$2 || $2 === '+' ? '-' : '+';
-                return $1 + $2 + $3;
-            })
-            .replace(/^ /, '');
-    }
-
-    function processStyle($dom, showOption, type) {
+    Drawer.prototype.display = function (type) {
         type = type || 'show';
+        var showOption = this.opts.showOption;
 
         var addOption;
         var removeOption;
@@ -560,11 +427,11 @@
                     addClass = addClass.join(' ');
                 }
 
-                $dom.addClass(addClass);
+                this._target.addClass(addClass);
             }
 
             if (addOption.style) {
-                $dom.css(addOption.style);
+                this._target.css(addOption.style);
             }
         }
 
@@ -576,13 +443,45 @@
                     removeClass = removeClass.join(' ');
                 }
 
-                $dom.removeClass(removeClass);
+                this._target.removeClass(removeClass);
             }
 
             if (removeOption.style) {
-                removeStyle($dom[0], removeOption.style);
+                this._target.removeStyle(removeOption.style);
             }
         }
+    };
+
+    function getWrapper(styleOpts) {
+        // 防止外部定义样式污染
+        var defaultStyle = {
+            margin: 0,
+            padding: 0,
+            border: 'none',
+            background: 'transparent'
+        };
+
+        var wrapperStyle = extend(
+            {
+                position: 'relative',
+                overflow: 'hidden'
+            },
+            _.prefix('translateZ', 0),
+            defaultStyle,
+            styleOpts && styleOpts.wrapper
+        );
+
+        var innerStyle = extend(
+            {position: 'absolute'},
+            defaultStyle,
+            styleOpts && styleOpts.inner
+        );
+
+        return $('<div class="w-drawer-wrapper" '
+            + 'style="' + _.stringify(wrapperStyle) + '">'
+            + '<div class="w-drawer-inner" '
+            + 'style="' + _.stringify(innerStyle) + '">'
+            + '</div></div>');
     }
 
     function extend() {
@@ -603,50 +502,259 @@
             });
     }
 
-    function outerWidth(elem, computed) {
-        computed = computed || getComputedStyle(elem);
-        return elem.clientWidth
-            + parseFloat(computed.borderLeft)
-            + parseFloat(computed.borderRight);
-    }
-
-    function outerHeight(elem, computed) {
-        computed = computed || getComputedStyle(elem);
-        return elem.clientHeight
-            + parseFloat(computed.borderTop)
-            + parseFloat(computed.borderBottom);
-    }
-
-    function width(elem, computed) {
-        computed = computed || getComputedStyle(elem);
-        return parseFloat(computed.width);
-    }
-
-    function height(elem, computed) {
-        computed = computed || getComputedStyle(elem);
-        return parseFloat(computed.height);
-    }
-
-    function css(elem, name, val) {
-        if (typeof name === 'string') {
-            if (val == null) {
-                var computed = getComputedStyle(elem);
-                return computed[name];
+    function EL(elem, root) {
+        if (typeof elem === 'string') {
+            if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
+                elem = (new DOMParser()).parseFromString(elem, 'text/xml');
             }
-
-            elem.style[name] = val;
-            return;
+            else {
+                elem = (_.getDom(root) || document).querySelector(elem);
+            }
         }
 
-        var text = elem.getAttribute('style') || '';
+        this.dom = elem;
+        this.computed = getComputedStyle(elem);
+        this.style = elem.style;
+    }
+
+    EL.prototype.attr = function (name, val) {
+        if (val == null) {
+            return this.dom.getAttribute(name);
+        }
+
+        this.dom.setAttribute(name, val);
+        return this;
+    };
+
+    EL.prototype.width = function (ext) {
+        ext = ext ? 'px' : 0;
+
+        if (this.computed.boxSizing) {
+            return parseFloat(this.computed.width)
+                - parseFloat(this.computed.paddingLeft)
+                - parseFloat(this.computed.paddingRight)
+                + ext;
+        }
+
+        return parseFloat(this.computed.width) + ext;
+    };
+
+    EL.prototype.height = function (ext) {
+        ext = ext ? 'px' : 0;
+
+        if (this.computed.boxSizing) {
+            return parseFloat(this.computed.height)
+                - parseFloat(this.computed.paddingTop)
+                - parseFloat(this.computed.paddingBottom)
+                + ext;
+        }
+
+        return parseFloat(this.computed.height) + ext;
+    };
+
+    EL.prototype.size = function (ext) {
+        return {
+            width: this.width(ext),
+            height: this.height(ext)
+        };
+    };
+
+    EL.prototype.outerWidth = function (ext) {
+        ext = ext ? 'px' : 0;
+        return this.dom.clientWidth
+            + parseFloat(this.computed.borderLeft)
+            + parseFloat(this.computed.borderRight)
+            + ext;
+    };
+
+    EL.prototype.outerHeight = function (ext) {
+        ext = ext ? 'px' : 0;
+        return this.dom.clientHeight
+            + parseFloat(this.computed.borderTop)
+            + parseFloat(this.computed.borderBottom)
+            + ext;
+    };
+
+    EL.prototype.outerSize = function (ext) {
+        return {
+            width: this.outerWidth(ext),
+            height: this.outerHeight(ext)
+        };
+    };
+
+    EL.prototype.css = function (name, val) {
+        switch (_.instance(name)) {
+            case 'String':
+                if (val == null) {
+                    return this.computed[name];
+                }
+
+                this.style[name] = val;
+                return this;
+
+            case 'Array':
+                if (val === 'remove') {
+                    return this.removeStyle(name);
+                }
+
+                return this.getStyle(name);
+
+            default:
+                return this.addStyle(name);
+        }
+    };
+
+    EL.prototype.addStyle = function (val) {
+        var text = this.attr('style') || '';
         text = !text.length || text.trim().slice(-1) === ';'
             ? text : (text + ';');
-        text += Object.keys(name).reduce(function (res, key) {
-            return res + key + ':' + name[key] + ';';
+        text += Object.keys(val).reduce(function (res, key) {
+            return res + key + ':' + val[key] + ';';
         }, '');
 
-        elem.getAttribute('style', text);
+        this.attr('style', text);
+        return this;
+    };
+
+    EL.prototype.getStyle = function (val) {
+        return val.reduce(function (res, name) {
+            res[name] = this.computed[name];
+            return res;
+        }.bind(this), {});
+    };
+
+    EL.prototype.removeStyle = function (exclude) {
+        exclude = typeof exclude === 'string' ? [exclude] : exclude;
+        var styleObj = _.parse(this.attr('style') || '');
+        var styleStr = Object.keys(styleObj)
+            .filter(function (key) {
+                return exclude.indexOf(key) === -1;
+            })
+            .reduce(function (res, key) {
+                return res + key + ':' + styleObj[key] + ';';
+            }, '');
+
+        this.attr('style', styleStr);
+        return this;
+    };
+
+    EL.prototype.addClass = function (val) {
+        this.dom.className = this.dom.className.trim() + ' ' + val.trim();
+        return this;
+    };
+
+    EL.prototype.removeClass = function (className) {
+        var classText = ' ' + this.dom.className + ' ';
+
+        if (/^ *$/.test(classText)) {
+            return this;
+        }
+
+        this.dom.className = className.split(' ')
+            .reduce(function (res, name) {
+                return res.replace(' ' + name + ' ', ' ');
+            }, classText)
+            .trim();
+
+        return this;
+    };
+
+    EL.prototype.insertAfter = function (elem) {
+        elem = _.getDom(elem);
+        var parent = elem.parentNode;
+
+        if (parent.lastChild === elem) {
+            parent.appendChild(this.dom);
+        }
+        else {
+            parent.insertBefore(this.dom, elem.nextSibling);
+        }
+
+        return this;
+    };
+
+    EL.prototype.append = function (elem) {
+        elem = _.getDom(elem);
+        this.dom.appendChild(elem);
+        return this;
+    };
+
+    EL.prototype.replaceWith = function (elem) {
+        elem = _.getDom(elem);
+        var parent = this.dom.parentNode;
+        parent.replaceChild(elem, this.dom);
+        return this;
+    };
+
+    EL.prototype.on = function (types, callback) {
+        (Array.isArray(types) ? types : types.split(' '))
+            .forEach(function (type) {
+                this.dom.addEventListener(type, callback);
+            }.bind(this));
+        return this;
+    };
+
+    function _(elem, root) {
+        if (elem instanceof EL) {
+            return elem;
+        }
+
+        return new EL(elem, root);
     }
+
+    _.stringify = function (styleObject) {
+        return Object.keys(styleObject).reduce(function (res, key) {
+            return res + _.dasherize(key) + ':' + styleObject[key] + ';';
+        }, '');
+    };
+
+    _.parse = function (styleString) {
+        return styleString.trim()
+            .replace(/ +(;|:) +/g, '$1')
+            .replace(/;$/, '')
+            .split(';')
+            .reduce(function (res, style) {
+                    style = style.split(':');
+                    res[style[0]] = style[1];
+                    return res;
+                }, {});
+    };
+
+    _.dasherize = function (str) {
+        return str.replace(/::/g, '/')
+            .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+            .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+            .replace(/_/g, '-')
+            .toLowerCase();
+    };
+
+    _.prefix = function (name, value) {
+        return ['', '-webkit-'].reduce(function (res, prefix) {
+            res[prefix + name] = value;
+            return res;
+        }, {});
+    };
+
+    _.inverse = function (style) {
+        return (' ' + style)
+            .replace(/( +)(\D?)(\d+)/g, function (str, $1, $2, $3) {
+                $2 = !$2 || $2 === '+' ? '-' : '+';
+                return $1 + $2 + $3;
+            })
+            .replace(/^ /, '');
+    };
+
+    _.instance = function (val) {
+        return Object.prototype.toString.call(val).slice(8, -1);
+    };
+
+    _.getDom = function (elem) {
+        if (elem instanceof EL) {
+            return elem.dom;
+        }
+
+        return elem;
+    };
 
     if (typeof module !== 'undefined' && typeof exports === 'object') {
         module.exports = Drawer;
