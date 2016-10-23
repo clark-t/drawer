@@ -76,6 +76,12 @@
             display: 'none'
         };
 
+        var targetPosition = $target.css('position');
+
+        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
+            wrapperStyle.position = targetPosition;
+        }
+
         var innerStyle = this.$parent.getStyle([
             'padding',
             'border',
@@ -84,12 +90,6 @@
         ]);
 
         innerStyle.margin = $.inverse(innerStyle.padding);
-
-        var targetPosition = $target.css('position');
-
-        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
-            wrapperStyle.position = targetPosition;
-        }
 
         var $wrapper = getWrapper({
             wrapper: wrapperStyle,
