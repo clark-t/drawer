@@ -259,14 +259,14 @@
         var $target = this.$target;
         var originStyle = $target.attr('style') || '';
 
-        var wrapperStyle = $.extend($target.getStyle([
+        var wrapperStyle = $.extend($target.outerSize(true),
+            $target.getStyle([
                 'display',
                 'top',
                 'right',
                 'bottom',
                 'left'
-            ]),
-            $target.outerSize(true)
+            ])
         );
 
         var innerStyle = $target.outerSize(true);
