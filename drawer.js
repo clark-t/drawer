@@ -624,18 +624,22 @@
     };
 
     EL.prototype.addClass = function (val) {
-        this.dom.className = this.dom.className.trim() + ' ' + val.trim();
+        this.dom.className = val.trim().split(' ')
+            .reduce(function (res, name) {
+                return res.indexOf(name) > -1
+                    ? res : res + ' ' + name;
+            }, this.dom.className.trim());
         return this;
     };
 
-    EL.prototype.removeClass = function (className) {
+    EL.prototype.removeClass = function (val) {
         var classText = ' ' + this.dom.className + ' ';
 
         if (/^ *$/.test(classText)) {
             return this;
         }
 
-        this.dom.className = className.split(' ')
+        this.dom.className = val.split(' ')
             .reduce(function (res, name) {
                 return res.replace(' ' + name + ' ', ' ');
             }, classText)
@@ -696,7 +700,6 @@
     $.parse = function (styleString) {
         return styleString.trim()
             .replace(/ +(;|:) +/g, '$1')
-            .replace(/;$/, '')
             .split(';')
             .reduce(function (res, style) {
                     if (style) {
