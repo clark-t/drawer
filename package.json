@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "an animation library to make dom show up like drawer.",
   "scripts": {
-    "build": "node ./node_modules/webpack/bin/webpack --config webpack.config.js -p"
+    "dev": "node ./node_modules/webpack/bin/webpack --config webpack.config.js -d -w",
+    "build": "node ./node_modules/webpack/bin/webpack --config webpack.prod.config.js -p"
   },
   "dependencies": {
     "ui-query": "https://github.com/clark-t/ui-query.git"
