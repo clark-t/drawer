@@ -180,130 +180,119 @@ function adjustShowTarget($target) {
     }
 }
 
-function getShowStartStyle(direction) {
+function getShowStartDirectionStyle(direction) {
     switch (direction) {
         case 'top':
-            return $target => {
-                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
-                $.extend(
-                    wrapper,
-                    {
-                        width: $target.outerWidth(px),
-                        height: 0
-                    }
-                );
-
-                $.extend(
-                    inner,
+            return $target => ({
+                wrapper: {
+                    width: $target.outerWidth(px),
+                    height: 0
+                },
+                inner: $.extend(
                     {
                         bottom: 0,
                         left: 0
                     },
                     $.prefix('transform', 'translateY(100%)')
-                );
-                return {wrapper, inner};
-            };
+                )
+            });
 
         case 'bottom':
-            return $target => {
-                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
-                $.extend(
-                    wrapper,
-                    {
-                        width: $target.outerWidth(px),
-                        height: 0
-                    }
-                );
-
-                $.extend(
-                    inner,
+            return $target => ({
+                wrapper: {
+                    width: $target.outerWidth(px),
+                    height: 0
+                },
+                inner: $.extend(
                     {
                         top: 0,
                         left: 0
                     },
                     $.prefix('transform', 'translateY(-100%)')
-                );
-                return {wrapper, inner};
-            };
+                )
+            });
 
         case 'left':
-            return $target => {
-                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
-                $.extend(
-                    wrapper,
-                    {
-                        width: 0,
-                        height: $target.outerHeight(px)
-                    }
-                );
-
-                $.extend(
-                    inner,
+            return $target => ({
+                wrapper: {
+                    width: 0,
+                    height: $target.outerHeight(px)
+                },
+                inner: $.extend(
                     {
                         top: 0,
                         right: 0
                     },
                     $.prefix('transform', 'translateX(100%)')
-                );
-                return {wrapper, inner};
-            };
+                )
+            });
 
         case 'right':
-            return $target => {
-                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
-                $.extend(
-                    wrapper,
-                    {
-                        width: 0,
-                        height: $target.outerHeight(px)
-                    }
-                );
-
-                $.extend(
-                    inner,
+            return $target => ({
+                wrapper: {
+                    width: 0,
+                    height: $target.outerHeight(px)
+                },
+                inner: $.extend(
                     {
                         top: 0,
                         left: 0
                     },
                     $.prefix('transform', 'translateX(-100%)')
-                );
-                return {wrapper, inner};
-            };
+                )
+            });
 
         default:
             break;
     }
 }
 
-function getShowStartBaseStyle($target, direction) {
-    let wrapper = $target.getStyle([
-        'display',
-        'top',
-        'bottom',
-        'right',
-        'left'
-    ]);
+function getShowStartStyle(direction) {
+    let getDirectionStyle = getShowStartDirectionStyle(direction);
 
-    if (['absolute', 'fixed'].indexOf($target.css('position')) > -1) {
-        wrapper[direction] = 'auto';
-    }
+    return $target => {
+        let {wrapper, inner} = getDirectionStyle($target);
 
-    let inner = $.extend(
-        {
-            margin: 0,
-            padding: 0,
-            border: 'none'
-        },
-        $target.outerSize(px)
-    );
+        $.extend(
+            wrapper,
+            $target.getStyle([
+                'display',
+                'top',
+                'bottom',
+                'right',
+                'left'
+            ])
+        );
 
-    return {wrapper, inner};
+        if (['absolute', 'fixed'].indexOf($target.css('position')) > -1) {
+            wrapper[direction] = 'auto';
+        }
+
+        $.extend(
+            inner,
+            {
+                margin: 0,
+                padding: 0,
+                border: 'none'
+            },
+            $target.outerSize(px)
+        );
+
+        return {wrapper, inner};
+    };
 }
 
 function getShowEndStyle(direction, transition) {
+    let inner;
+
     switch (direction) {
         case 'top':
         case 'bottom':
+            inner = $.extend(
+                $.prefix('transform', 'translateY(0)'),
+                transition
+            );
+
             return $target => ({
                 wrapper: $.extend(
                     {
@@ -311,14 +300,16 @@ function getShowEndStyle(direction, transition) {
                     },
                     transition
                 ),
-                inner: $.extend(
-                    $.prefix('transform', 'translateY(0)'),
-                    transition
-                )
+                inner: inner
             });
 
         case 'left':
         case 'right':
+            inner = $.extend(
+                $.prefix('transform', 'translateX(0)'),
+                transition
+            );
+
             return $target => ({
                 wrapper: $.extend(
                     {
@@ -326,10 +317,7 @@ function getShowEndStyle(direction, transition) {
                     },
                     transition
                 ),
-                inner: $.extend(
-                    $.prefix('transform', 'translateX(0)'),
-                    transition
-                )
+                inner: inner
             });
 
         default:
@@ -460,34 +448,35 @@ function getHideEndStyle(direction, transition) {
     return {wrapper, inner};
 }
 
+const defaultStyle = {
+    margin: 0,
+    padding: 0,
+    border: 'none',
+    background: 'transparent'
+};
+
+const defaultWrapperStyle = $.extend(
+    {
+        position: 'relative',
+        overflow: 'hidden'
+    },
+    $.prefix('translateZ', 0),
+    defaultStyle
+);
+
+const defaultInnerStyle = $.extend(
+    {position: 'absolute'},
+    defaultStyle
+);
+
+
 function getWrapper({wrapper, inner}) {
-    // 防止外部定义样式污染
-    const defaultStyle = {
-        margin: 0,
-        padding: 0,
-        border: 'none',
-        background: 'transparent'
-    };
-
-    let wrapperStyle = $.extend(
-        {
-            position: 'relative',
-            overflow: 'hidden'
-        },
-        $.prefix('translateZ', 0),
-        defaultStyle,
-        wrapper
-    );
-
-    let innerStyle = $.extend(
-        {position: 'absolute'},
-        defaultStyle,
-        inner
-    );
+    wrapper = $.extend({}, defaultWrapperStyle, wrapper);
+    inner = $.extend({}, defaultInnerStyle, inner);
 
     return $(`
-        <div class="w-drawer-wrapper" style="${$.stringify(wrapperStyle)}">
-            <div class="w-drawer-inner" style="${$.stringify(innerStyle)}">
+        <div class="w-drawer-wrapper" style="${$.stringify(wrapper)}">
+            <div class="w-drawer-inner" style="${$.stringify(inner)}">
             </div>
         </div>
     `);
