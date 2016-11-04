@@ -31,7 +31,7 @@
     "javascript",
     "js"
   ],
-  "main": "drawer.js",
+  "main": "dist/index.min.js",
   "directories": {
     "test": "tests"
   }
