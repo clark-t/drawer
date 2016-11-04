@@ -4,6 +4,7 @@
  */
 
 import $ from 'ui-query';
+const px = true;
 
 export default class Drawer {
     constructor({
@@ -23,8 +24,14 @@ export default class Drawer {
             onChange
         });
 
+        const transition = $.prefix('transition', `${duration}ms ${timingFunction}`);
+
         this.$target = $(target);
         this.$parent = this.$target.parent();
+        this.getShowStartStyle = getShowStartStyle(direction);
+        this.getShowEndStyle = getShowEndStyle(direction, transition);
+        this.getHideStartStyle = getHideStartStyle(direction);
+        this.hideEndStyle = getHideEndStyle(direction, transition);
         this.status = 'ready';
     }
 
@@ -34,170 +41,29 @@ export default class Drawer {
         }
 
         this.status = 'pending';
-        const direction = this.direction;
+
         const $target = this.$target;
 
         let originStyle = $target.attr('style') || '';
 
-        let wrapperStyle = {
-            width: 0,
-            height: 0,
-            display: 'none'
-        };
-
-        let targetPosition = $target.css('position');
-
-        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
-            wrapperStyle.position = targetPosition;
-        }
-
-        let innerStyle = this.$parent.getStyle([
-            'padding',
-            'border',
-            'width',
-            'height'
-        ]);
-
-        innerStyle.margin = $.inverse(innerStyle.padding);
-
-        let $wrapper = getWrapper({
-            wrapper: wrapperStyle,
-            inner: innerStyle
-        });
-
+        let $wrapper = getWrapper(getShowInitStyle($target, this.$parent));
         let $inner = $('.w-drawer-inner', $wrapper);
 
         // 插入wrapper
         $wrapper.insertAfter($target);
         $inner.append($target);
 
-        this.display('show');
+        display($target, this.showOption, 'show');
         $wrapper.removeStyle('display');
 
-        let isFloat = false;
+        adjustShowTarget($target);
 
-        if ($target.width() === 0
-            && $target.css('display') === 'block'
-            && $target.css('float') === 'none'
-        ) {
-            $target.css('float', 'left');
-            isFloat = true;
-        }
-
-        if ($target.css('box-sizing') === 'border-box') {
-            $target.css($target.outerSize(true));
-        }
-        else {
-            $target.css($target.size(true));
-        }
-
-        if (isFloat) {
-            $target.removeStyle('float');
-        }
-
-        if (targetPosition !== 'static') {
-            $target.css('position', 'static');
-        }
-
-        wrapperStyle = $target.getStyle([
-            'display',
-            'top',
-            'bottom',
-            'right',
-            'left'
-        ]);
-
-        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
-            wrapperStyle[direction] = 'auto';
-        }
-
-        innerStyle = $.extend({
-                margin: 0,
-                padding: 0,
-                border: 'none'
-            },
-            $target.outerSize(true)
-        );
-
-        switch (direction) {
-            case 'top':
-                $.extend(
-                    wrapperStyle,
-                    {
-                        width: $target.outerWidth(true),
-                        height: 0
-                    }
-                );
-
-                $.extend(
-                    innerStyle,
-                    {
-                        bottom: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translateY(100%)')
-                );
-                break;
-            case 'bottom':
-                $.extend(
-                    wrapperStyle,
-                    {
-                        width: $target.outerWidth(true),
-                        height: 0
-                    }
-                );
-
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translateY(-100%)')
-                );
-                break;
-            case 'left':
-                $.extend(
-                    wrapperStyle,
-                    {
-                        width: 0,
-                        height: $target.outerHeight(true)
-                    }
-                );
-
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        right: 0
-                    },
-                    $.prefix('transform', 'translateX(100%)')
-                );
-                break;
-            case 'right':
-                $.extend(
-                    wrapperStyle,
-                    {
-                        width: 0,
-                        height: $target.outerHeight(true)
-                    }
-                );
-
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translateX(-100%)')
-                );
-                break;
-            default:
-                break;
-        }
-
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        let {
+            wrapper: wrapperStart,
+            inner: innerStart
+        } = this.getShowStartStyle($target);
+        $wrapper.css(wrapperStart);
+        $inner.css(innerStart);
 
         $inner.on('webkitTransitionEnd transitionend', () => {
             $wrapper.replaceWith($target);
@@ -208,35 +74,12 @@ export default class Drawer {
             this.onChange('show');
         });
 
-        // 动画效果
-        let transition = `${this.duration}ms ${this.timingFunction}`;
-
-        wrapperStyle = $.prefix('transition', transition);
-        innerStyle = $.prefix('transition', transition);
-
-        switch (direction) {
-            case 'top':
-                wrapperStyle.height = $target.outerHeight(true),
-                $.extend(innerStyle, $.prefix('transform', 'translateY(0)'));
-                break;
-            case 'bottom':
-                wrapperStyle.height = $target.outerHeight(true);
-                $.extend(innerStyle, $.prefix('transform', 'translateY(0)'));
-                break;
-            case 'left':
-                wrapperStyle.width = $target.outerWidth(true);
-                $.extend(innerStyle, $.prefix('transform', 'translateX(0)'));
-                break;
-            case 'right':
-                wrapperStyle.width = $target.outerWidth(true);
-                $.extend(innerStyle, $.prefix('transform', 'translateX(0)'));
-                break;
-            default:
-                break;
-        }
-
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        let {
+            wrapper: wrapperEnd,
+            inner: innerEnd
+        } = this.getShowEndStyle($target);
+        $wrapper.css(wrapperEnd);
+        $inner.css(innerEnd);
     }
 
     hide() {
@@ -248,98 +91,20 @@ export default class Drawer {
         const $target = this.$target;
         let originStyle = $target.attr('style') || '';
 
-        let wrapperStyle = $.extend(
-            $target.outerSize(true),
-            $target.getStyle([
-                'display',
-                'top',
-                'right',
-                'bottom',
-                'left'
-            ])
-        );
-
-        let innerStyle = $target.outerSize(true);
-        let targetPosition = $target.css('position');
-
-        if (targetPosition !== 'static') {
-            wrapperStyle.position = targetPosition;
-        }
-
-        let direction = this.direction;
-
-        if (['absolute', 'fixed'].indexOf(targetPosition) > -1) {
-            wrapperStyle[direction] = 'auto';
-        }
-
-        switch (direction) {
-            case 'top':
-                $.extend(
-                    innerStyle,
-                    {
-                        bottom: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translateY(0)')
-                );
-                break;
-            case 'bottom':
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translateY(0)')
-                );
-                break;
-            case 'left':
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        right: 0
-                    },
-                    $.prefix('transform', 'translateX(0)')
-                );
-                break;
-            case 'right':
-                $.extend(
-                    innerStyle,
-                    {
-                        top: 0,
-                        left: 0
-                    },
-                    $.prefix('transform', 'translatex(0)')
-                );
-                break;
-            default:
-                break;
-        }
-
-        let $wrapper = getWrapper({
-            wrapper: wrapperStyle,
-            inner: innerStyle
-        });
-
+        let $wrapper = getWrapper(this.getHideStartStyle($target));
         let $inner = $('.w-drawer-inner', $wrapper);
 
-        let targetStyle = $target.css('box-sizing') === 'border-box'
-            ? $target.outerSize(true) : $target.size(true);
-
-        if (targetPosition !== 'static') {
-            targetStyle.position = 'static';
-        }
+        adjustHideTarget($target);
 
         // 插入wrapper
-        $wrapper.insertAfter($target.css(targetStyle));
+        $wrapper.insertAfter($target);
         $inner.append($target);
         // @HACK 在完成插入操作后 需要强制触发一次repaint
         // 否则transition有可能不会触发
         $wrapper.height();
 
         $inner.on('webkitTransitionEnd transitionend', () => {
-            this.display('hide');
+            display($target, this.showOption, 'hide');
             $wrapper.replaceWith($target);
             $target.attr('style', originStyle);
             $wrapper = null;
@@ -348,39 +113,9 @@ export default class Drawer {
             this.onChange('hide');
         });
 
-        switch (direction) {
-            case 'top':
-                wrapperStyle = {height: 0};
-                innerStyle = $.prefix('transform', 'translateY(100%)');
-                break;
-
-            case 'bottom':
-                wrapperStyle = {height: 0};
-                innerStyle = $.prefix('transform', 'translateY(-100%)');
-                break;
-
-            case 'left':
-                wrapperStyle = {width: 0};
-                innerStyle = $.prefix('transform', 'translateX(100%)');
-                break;
-
-            case 'right':
-                wrapperStyle = {width: 0};
-                innerStyle = $.prefix('transform', 'translateX(-100%)');
-                break;
-
-            default:
-                break;
-        }
-
-        // 动画效果
-        let transition = `${this.duration}ms ${this.timingFunction}`;
-
-        $.extend(wrapperStyle, $.prefix('transition', transition));
-        $.extend(innerStyle, $.prefix('transition', transition));
-
-        $wrapper.css(wrapperStyle);
-        $inner.css(innerStyle);
+        let {wrapper, inner} = this.hideEndStyle;
+        $wrapper.css(wrapper);
+        $inner.css(inner);
     }
 
     toggle() {
@@ -391,50 +126,343 @@ export default class Drawer {
             this.hide();
         }
     }
+}
 
-    display(type = 'show') {
-        let showOption = this.showOption;
-        let [addOption, removeOption] = type === 'show'
-            ? [showOption.add, showOption.remove]
-            : [showOption.remove, showOption.add];
+function getShowInitStyle($target, $parent) {
+    let wrapper = {
+        width: 0,
+        height: 0,
+        display: 'none'
+    };
 
-        if (addOption) {
-            if (addOption.class) {
-                let classes = addOption.class;
+    let position = $target.css('position');
 
-                if (Array.isArray(classes)) {
-                    classes = classes.join(' ');
-                }
+    if (['absolute', 'fixed'].indexOf(position) > -1) {
+        wrapper.position = position;
+    }
 
-                this.$target.addClass(classes);
-            }
+    let inner = $parent.getStyle([
+        'padding',
+        'border',
+        'width',
+        'height'
+    ]);
 
-            if (addOption.style) {
-                this.$target.css(addOption.style);
-            }
-        }
+    inner.margin = $.inverse(inner.padding);
 
-        if (removeOption) {
-            if (removeOption.class) {
-                let classes = removeOption.class;
+    return {wrapper, inner};
+}
 
-                if (Array.isArray(classes)) {
-                    classes = classes.join(' ');
-                }
+function adjustShowTarget($target) {
+    let isFloat = false;
 
-                this.$target.removeClass(classes);
-            }
+    if ($target.width() === 0
+        && $target.css('display') === 'block'
+        && $target.css('float') === 'none'
+    ) {
+        $target.css('float', 'left');
+        isFloat = true;
+    }
 
-            if (removeOption.style) {
-                this.$target.removeStyle(removeOption.style);
-            }
-        }
+    if ($target.css('box-sizing') === 'border-box') {
+        $target.css($target.outerSize(px));
+    }
+    else {
+        $target.css($target.size(px));
+    }
+
+    if (isFloat) {
+        $target.removeStyle('float');
+    }
+
+    if ($target.css('position') !== 'static') {
+        $target.css('position', 'static');
     }
 }
 
-function getWrapper(styleOpts = {wrapper: null, inner: null}) {
+function getShowStartStyle(direction) {
+    switch (direction) {
+        case 'top':
+            return $target => {
+                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
+                $.extend(
+                    wrapper,
+                    {
+                        width: $target.outerWidth(px),
+                        height: 0
+                    }
+                );
+
+                $.extend(
+                    inner,
+                    {
+                        bottom: 0,
+                        left: 0
+                    },
+                    $.prefix('transform', 'translateY(100%)')
+                );
+                return {wrapper, inner};
+            };
+
+        case 'bottom':
+            return $target => {
+                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
+                $.extend(
+                    wrapper,
+                    {
+                        width: $target.outerWidth(px),
+                        height: 0
+                    }
+                );
+
+                $.extend(
+                    inner,
+                    {
+                        top: 0,
+                        left: 0
+                    },
+                    $.prefix('transform', 'translateY(-100%)')
+                );
+                return {wrapper, inner};
+            };
+
+        case 'left':
+            return $target => {
+                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
+                $.extend(
+                    wrapper,
+                    {
+                        width: 0,
+                        height: $target.outerHeight(px)
+                    }
+                );
+
+                $.extend(
+                    inner,
+                    {
+                        top: 0,
+                        right: 0
+                    },
+                    $.prefix('transform', 'translateX(100%)')
+                );
+                return {wrapper, inner};
+            };
+
+        case 'right':
+            return $target => {
+                let {wrapper, inner} = getShowStartBaseStyle($target, direction);
+                $.extend(
+                    wrapper,
+                    {
+                        width: 0,
+                        height: $target.outerHeight(px)
+                    }
+                );
+
+                $.extend(
+                    inner,
+                    {
+                        top: 0,
+                        left: 0
+                    },
+                    $.prefix('transform', 'translateX(-100%)')
+                );
+                return {wrapper, inner};
+            };
+
+        default:
+            break;
+    }
+}
+
+function getShowStartBaseStyle($target, direction) {
+    let wrapper = $target.getStyle([
+        'display',
+        'top',
+        'bottom',
+        'right',
+        'left'
+    ]);
+
+    if (['absolute', 'fixed'].indexOf($target.css('position')) > -1) {
+        wrapper[direction] = 'auto';
+    }
+
+    let inner = $.extend(
+        {
+            margin: 0,
+            padding: 0,
+            border: 'none'
+        },
+        $target.outerSize(px)
+    );
+
+    return {wrapper, inner};
+}
+
+function getShowEndStyle(direction, transition) {
+    switch (direction) {
+        case 'top':
+        case 'bottom':
+            return $target => ({
+                wrapper: $.extend(
+                    {
+                        height: $target.outerHeight(px)
+                    },
+                    transition
+                ),
+                inner: $.extend(
+                    $.prefix('transform', 'translateY(0)'),
+                    transition
+                )
+            });
+
+        case 'left':
+        case 'right':
+            return $target => ({
+                wrapper: $.extend(
+                    {
+                        width: $target.outerWidth(px)
+                    },
+                    transition
+                ),
+                inner: $.extend(
+                    $.prefix('transform', 'translateX(0)'),
+                    transition
+                )
+            });
+
+        default:
+            break;
+    }
+}
+
+function adjustHideTarget($target) {
+    let style = $target.css('box-sizing') === 'border-box'
+        ? $target.outerSize(px) : $target.size(px);
+
+    if ($target.css('position') !== 'static') {
+        style.position = 'static';
+    }
+
+    $target.css(style);
+}
+
+function getHideStartStyle(direction) {
+    let inner;
+
+    switch (direction) {
+        case 'top':
+            inner = $.extend(
+                {
+                    bottom: 0,
+                    left: 0
+                },
+                $.prefix('transform', 'translateY(0)')
+            );
+            break;
+
+        case 'bottom':
+            inner = $.extend(
+                {
+                    top: 0,
+                    left: 0
+                },
+                $.prefix('transform', 'translateY(0)')
+            );
+            break;
+
+        case 'left':
+            inner = $.extend(
+                {
+                    top: 0,
+                    right: 0
+                },
+                $.prefix('transform', 'translateX(0)')
+            );
+            break;
+
+        case 'right':
+            inner = $.extend(
+                {
+                    top: 0,
+                    left: 0
+                },
+                $.prefix('transform', 'translatex(0)')
+            );
+            break;
+
+        default:
+            break;
+    }
+
+    return $target => {
+        let outerSize = $target.outerSize(px);
+        let wrapper = $.extend(
+            $target.getStyle([
+                'display',
+                'top',
+                'right',
+                'bottom',
+                'left'
+            ]),
+            outerSize
+        );
+
+        let position = $target.css('position');
+
+        if (position !== 'static') {
+            wrapper.position = position;
+        }
+
+        if (['absolute', 'fixed'].indexOf(position) > -1) {
+            wrapper[direction] = 'auto';
+        }
+
+        return {
+            wrapper: wrapper,
+            inner: $.extend({}, outerSize, inner)
+        };
+    };
+}
+
+function getHideEndStyle(direction, transition) {
+    let wrapper;
+    let inner;
+
+    switch (direction) {
+        case 'top':
+            wrapper = {height: 0};
+            inner = $.prefix('transform', 'translateY(100%)');
+            break;
+
+        case 'bottom':
+            wrapper = {height: 0};
+            inner = $.prefix('transform', 'translateY(-100%)');
+            break;
+
+        case 'left':
+            wrapper = {width: 0};
+            inner = $.prefix('transform', 'translateX(100%)');
+            break;
+
+        case 'right':
+            wrapper = {width: 0};
+            inner = $.prefix('transform', 'translateX(-100%)');
+            break;
+
+        default:
+            break;
+    }
+
+    $.extend(wrapper, transition);
+    $.extend(inner, transition);
+    return {wrapper, inner};
+}
+
+function getWrapper({wrapper, inner}) {
     // 防止外部定义样式污染
-    let defaultStyle = {
+    const defaultStyle = {
         margin: 0,
         padding: 0,
         border: 'none',
@@ -448,13 +476,13 @@ function getWrapper(styleOpts = {wrapper: null, inner: null}) {
         },
         $.prefix('translateZ', 0),
         defaultStyle,
-        styleOpts.wrapper
+        wrapper
     );
 
     let innerStyle = $.extend(
         {position: 'absolute'},
         defaultStyle,
-        styleOpts.inner
+        inner
     );
 
     return $(`
@@ -463,4 +491,42 @@ function getWrapper(styleOpts = {wrapper: null, inner: null}) {
             </div>
         </div>
     `);
+}
+
+function display($target, showOption, type = 'show') {
+    let [addOption, removeOption] = type === 'show'
+        ? [showOption.add, showOption.remove]
+        : [showOption.remove, showOption.add];
+
+    if (addOption) {
+        if (addOption.class) {
+            let classes = addOption.class;
+
+            if (Array.isArray(classes)) {
+                classes = classes.join(' ');
+            }
+
+            $target.addClass(classes);
+        }
+
+        if (addOption.style) {
+            $target.css(addOption.style);
+        }
+    }
+
+    if (removeOption) {
+        if (removeOption.class) {
+            let classes = removeOption.class;
+
+            if (Array.isArray(classes)) {
+                classes = classes.join(' ');
+            }
+
+            $target.removeClass(classes);
+        }
+
+        if (removeOption.style) {
+            $target.removeStyle(removeOption.style);
+        }
+    }
 }

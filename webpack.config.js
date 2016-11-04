@@ -1,3 +1,8 @@
+/**
+ * @file webpack.config.js
+ * @author clarkt(clarktanglei@163.com)
+ */
+
 module.exports = {
     entry: {
         index: './index.js'
