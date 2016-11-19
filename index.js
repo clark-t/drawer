@@ -455,24 +455,14 @@ const defaultStyle = {
     background: 'transparent'
 };
 
-const defaultWrapperStyle = $.extend(
-    {
-        position: 'relative',
-        overflow: 'hidden'
-    },
-    $.prefix('translateZ', 0),
-    defaultStyle
-);
-
-const defaultInnerStyle = $.extend(
-    {position: 'absolute'},
-    defaultStyle
-);
-
-
 function getWrapper({wrapper, inner}) {
-    wrapper = $.extend({}, defaultWrapperStyle, wrapper);
-    inner = $.extend({}, defaultInnerStyle, inner);
+    wrapper = $.extend(
+        {position: 'relative', overflow: 'hidden'},
+        $.prefix('translateZ', 0),
+        defaultStyle,
+        wrapper
+    );
+    inner = $.extend({position: 'absolute'}, defaultStyle, inner);
 
     return $(`
         <div class="w-drawer-wrapper" style="${$.stringify(wrapper)}">
